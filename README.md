@@ -5,6 +5,7 @@
 ## Table of contents
 1. [Overview](README.md#1-overview)  
 2. [Installation](README.md#2-installation)  
+3. [Running tests](README.md#3-running-tests)
 
 ## 1. Overview
 
@@ -20,3 +21,13 @@ python -m pip install --upgrade pip
 pip install -e .[all]
 pre-commit install
 ```
+
+## 3. Running tests
+
+Follow the installation instructions. Then run the following commands from the root of the repository.
+
+```bash
+pytest
+```
+
+NOTE: Make sure to active the conda environment with `conda activate tumor_semseg` before running the tests.
