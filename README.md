@@ -5,7 +5,6 @@
 ## Table of contents
 1. [Overview](README.md#1-overview)  
 2. [Installation](README.md#2-installation)  
-3. [Features](README.md#3-features)
 
 ## 1. Overview
 
@@ -21,7 +20,3 @@ python -m pip install --upgrade pip
 pip install -e .[all]
 pre-commit install
 ```
-
-
-###### TODO: GitHub bio README.md
-###### TODO: GitHub and LinkedIn photo improvement
