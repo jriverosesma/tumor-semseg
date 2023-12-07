@@ -16,7 +16,7 @@
 | lexid             | 2021.1006 | MIT License                          |
 | looseversion      | 1.3.0     | Python Software Foundation License   |
 | mccabe            | 0.7.0     | MIT License                          |
-| my-package        | 0.1.0     | UNKNOWN                              |
+| tumor_semseg      | 0.1.0     | MIT License                          |
 | mypy-extensions   | 1.0.0     | MIT License                          |
 | nodeenv           | 1.8.0     | BSD License                          |
 | packaging         | 23.2      | Apache Software License; BSD License |

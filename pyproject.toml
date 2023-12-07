@@ -1,17 +1,18 @@
 [tool.poetry]
-name = "my-package"
+name = "tumor_semseg"
 version = "v0.1.0"
-description = "Simple and effective Python project template"
+description = "Semantic segmentation for tumor detection"
 authors = ["Juan Rivero Sesma <jriverosesma@gmail.com>"]
 readme = "README.md"
+license = "MIT"
 include = ["NOTICES", "LICENSE", "CHANGELOG.md"]
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/jriverosesma/python-project"
-"Issue Tracker" = "https://github.com/jriverosesma/python-project/issues"
+"Homepage" = "https://github.com/jriverosesma/tumor-semantic-segmentation"
+"Issue Tracker" = "https://github.com/jriverosesma/tumor-semantic-segmentation/issues"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -38,17 +39,14 @@ all = ["black", "bumpver", "isort", "flake8", "pre-commit", "pip-licenses", "pyt
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.scripts]
-my_package_script = "my_package.main:main"
-
 [tool.black]
 line-length = 120
 
 [tool.isort]
 profile = "black"
 line_length = 120
-known_first_party = ["my_package"]
-import_heading_firstparty = "My Package"
+known_first_party = ["tumor_semseg"]
+import_heading_firstparty = "Tumor SemSeg"
 
 
 [tool.bumpver]
@@ -64,7 +62,7 @@ commit_message  = "Bump version: {old_version} → {new_version}"
     '^current_version = "{version}"$',
     '^version = "{version}"$',
 ]
-"my_package/__init__.py" = [
+"tumor_semseg/__init__.py" = [
     '^__version__ = "{version}"$',
 ]
 
