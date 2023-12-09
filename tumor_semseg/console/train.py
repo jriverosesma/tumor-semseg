@@ -1,3 +1,7 @@
+"""
+This files defines the entry point for training.
+"""
+
 from pathlib import Path
 
 import lightning as L
