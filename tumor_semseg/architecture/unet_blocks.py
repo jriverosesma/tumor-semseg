@@ -7,7 +7,7 @@ import torch.nn as nn
 
 
 class DoubleConv(nn.Module):
-    def __init__(self, in_channels, out_channels, activation):
+    def __init__(self, in_channels: int, out_channels: int, activation: nn.Module):
         super().__init__()
         self.double_conv = nn.Sequential(
             nn.Conv2d(in_channels, out_channels, kernel_size=3, padding=1, bias=False),
@@ -23,7 +23,7 @@ class DoubleConv(nn.Module):
 
 
 class Down(nn.Module):
-    def __init__(self, in_channels, out_channels, activation):
+    def __init__(self, in_channels: int, out_channels: int, activation: nn.Module):
         super().__init__()
         self.down_conv = nn.Sequential(nn.MaxPool2d(kernel_size=2), DoubleConv(in_channels, out_channels, activation))
 
@@ -32,7 +32,7 @@ class Down(nn.Module):
 
 
 class Up(nn.Module):
-    def __init__(self, in_channels, out_channels, activation):
+    def __init__(self, in_channels: int, out_channels: int, activation: nn.Module):
         super().__init__()
         self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
         self.conv = DoubleConv(in_channels, out_channels, activation)
@@ -46,7 +46,7 @@ class Up(nn.Module):
 
 
 class Head(nn.Module):
-    def __init__(self, in_channels, n_classes):
+    def __init__(self, in_channels: int, n_classes: int):
         super().__init__()
         self.head = nn.Conv2d(in_channels, n_classes, kernel_size=1, bias=False)
 
