@@ -12,7 +12,7 @@ from torch import Tensor
 
 
 class DiceLoss(nn.Module):
-    def __init__(self, n_classes, weight, smooth):
+    def __init__(self, n_classes, weight=None, smooth=1e-6):
         super().__init__()
         self.n_classes = n_classes
         self.smooth = smooth
@@ -29,11 +29,11 @@ class DiceLoss(nn.Module):
         union = inputs.sum(-1) + targets_one_hot.sum(-1)
         dice = (2.0 * intersection + self.smooth) / (union + self.smooth)
 
-        return (self.weight * (1 - dice)).mean()
+        return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
 
 
 class CrossEntropyLoss(nn.Module):
-    def __init__(self, n_classes, weight):
+    def __init__(self, n_classes, weight=None):
         super().__init__()
         self.n_classes = n_classes
         self.weight = weight
@@ -46,7 +46,7 @@ class CrossEntropyLoss(nn.Module):
 
 
 class EdgeLoss(nn.Module):
-    def __init__(self, n_classes, weight):
+    def __init__(self, n_classes, weight=None):
         super().__init__()
         self.weight = weight
         self.n_classes = n_classes
@@ -65,8 +65,8 @@ class EdgeLoss(nn.Module):
             class_target = targets_one_hot[:, class_idx : class_idx + 1, :, :]
             edge_inputs = torch.abs(self.sobel_x(class_input)) + torch.abs(self.sobel_y(class_input))
             edge_targets = torch.abs(self.sobel_x(class_target)) + torch.abs(self.sobel_y(class_target))
-
-            loss += self.weight[class_idx] * F.mse_loss(edge_inputs, edge_targets)
+            class_edge_loss = F.mse_loss(edge_inputs, edge_targets)
+            loss += class_edge_loss if self.weight is None else self.weight[class_idx] * class_edge_loss
 
         return loss
 
@@ -81,12 +81,6 @@ class DiceCEEdgeLossConfig:
     dice_weight: Optional[Tensor] = None
     ce_weight: Optional[Tensor] = None
     edge_weight: Optional[Tensor] = None
-
-    def __post_init__(self):
-        if self.dice_weight is None:
-            self.dice_weight = torch.ones(self.n_classes).to("cuda")
-        if self.edge_weight is None:
-            self.edge_weight = torch.ones(self.n_classes).to("cuda")
 
 
 class DiceCEEdgeLoss(nn.Module):
