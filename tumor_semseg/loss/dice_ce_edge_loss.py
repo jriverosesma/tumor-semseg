@@ -39,7 +39,6 @@ class CrossEntropyLoss(nn.Module):
         self.weight = weight
 
     def forward(self, inputs, targets):
-        inputs = F.softmax(inputs, dim=1)
         one_hot_inputs = F.one_hot(targets.long(), self.n_classes).transpose(1, 4).squeeze().float()
 
         return F.cross_entropy(inputs, one_hot_inputs, self.weight)
