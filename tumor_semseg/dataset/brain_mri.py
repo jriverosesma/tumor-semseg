@@ -56,7 +56,6 @@ class BrainMRIDataModule(L.LightningDataModule):
     def setup(self, stage: str):
         if stage == "fit":
             self.train = BrainMRIDataset(self.x_train, self.y_train, self.config.image_size)
-        elif stage == "validate":
             self.val = BrainMRIDataset(self.x_val, self.y_val, self.config.image_size)
 
     def prepare_data(self) -> None:

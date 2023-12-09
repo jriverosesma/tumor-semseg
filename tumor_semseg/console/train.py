@@ -36,11 +36,6 @@ def main():
 
     # Train
     taxi_datamodule.prepare_data()
-
-    # BUG: We should not need to call this.
-    taxi_datamodule.setup("fit")
-    taxi_datamodule.setup("validate")
-
     trainer.fit(model, datamodule=taxi_datamodule)
 
 
