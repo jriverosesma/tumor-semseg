@@ -39,9 +39,7 @@ class CrossEntropyLoss(nn.Module):
         self.weight = weight
 
     def forward(self, inputs, targets):
-        one_hot_targets = F.one_hot(targets.long(), self.n_classes).transpose(1, 4).squeeze().float()
-
-        return F.cross_entropy(inputs, one_hot_targets, self.weight)
+        return F.cross_entropy(inputs, targets, self.weight)
 
 
 class EdgeLoss(nn.Module):
