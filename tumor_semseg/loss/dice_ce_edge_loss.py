@@ -32,16 +32,6 @@ class DiceLoss(nn.Module):
         return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
 
 
-class CrossEntropyLoss(nn.Module):
-    def __init__(self, n_classes, weight=None):
-        super().__init__()
-        self.n_classes = n_classes
-        self.weight = weight
-
-    def forward(self, inputs, targets):
-        return F.cross_entropy(inputs, targets, self.weight)
-
-
 class EdgeLoss(nn.Module):
     def __init__(self, n_classes, weight=None):
         super().__init__()
@@ -85,12 +75,11 @@ class DiceCEEdgeLoss(nn.Module):
         super().__init__()
         self.config = config
         self.dice_loss = DiceLoss(config.n_classes, config.dice_weight, config.dice_smooth)
-        self.cross_entropy_loss = CrossEntropyLoss(config.n_classes, config.ce_weight)
         self.edge_loss = EdgeLoss(config.n_classes, config.edge_weight)
 
     def forward(self, inputs, targets):
         dice_loss = self.dice_loss(inputs, targets)
-        ce_loss = self.cross_entropy_loss(inputs, targets)
+        ce_loss = F.cross_entropy(inputs, targets, self.config.ce_weight)
         edge_loss = self.edge_loss(inputs, targets)
         total_loss = self.config.alpha * dice_loss + self.config.beta * ce_loss + self.config.gamma * edge_loss
 
