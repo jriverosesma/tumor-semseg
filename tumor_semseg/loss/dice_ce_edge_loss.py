@@ -11,6 +11,10 @@ import torch.nn.functional as F
 from torch import Tensor
 
 
+def one_hot_encode(targets: Tensor, n_classes: int):
+    return targets if n_classes == 1 else F.one_hot(targets.long(), n_classes).squeeze(1).permute(0, 3, 1, 2).float()
+
+
 class DiceLoss(nn.Module):
     def __init__(self, n_classes, weight=None, smooth=1e-6):
         super().__init__()
@@ -22,7 +26,7 @@ class DiceLoss(nn.Module):
         inputs = F.softmax(inputs, dim=1)
         inputs = inputs.view(inputs.size(0), self.n_classes, -1)
 
-        targets_one_hot = F.one_hot(targets, self.n_classes).permute(0, 3, 1, 2).float()
+        targets_one_hot = one_hot_encode(targets, self.n_classes)
         targets_one_hot = targets_one_hot.view(targets_one_hot.size(0), self.n_classes, -1)
 
         intersection = (inputs * targets_one_hot).sum(-1)
@@ -30,6 +34,19 @@ class DiceLoss(nn.Module):
         dice = (2.0 * intersection + self.smooth) / (union + self.smooth)
 
         return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
+
+
+class CELoss(nn.Module):
+    def __init__(self, n_classes: int, weight=None):
+        super().__init__()
+        self.n_classes = n_classes
+        self.weight = weight
+
+    def forward(self, inputs, targets):
+        if self.n_classes == 1:
+            return F.binary_cross_entropy_with_logits(inputs, targets, self.weight)
+        else:
+            return F.cross_entropy(inputs, targets.squeeze(1).long(), self.weight)
 
 
 class EdgeLoss(nn.Module):
@@ -45,7 +62,7 @@ class EdgeLoss(nn.Module):
         self.sobel_y.weight = nn.Parameter(sobel_kernel_y, requires_grad=False)
 
     def forward(self, inputs, targets):
-        targets_one_hot = F.one_hot(targets, self.n_classes).permute(0, 3, 1, 2).float()
+        targets_one_hot = one_hot_encode(targets, self.n_classes)
         loss = 0.0
         for class_idx in range(self.n_classes):
             class_input = inputs[:, class_idx : class_idx + 1, :, :]
@@ -75,12 +92,12 @@ class DiceCEEdgeLoss(nn.Module):
         super().__init__()
         self.config = config
         self.dice_loss = DiceLoss(config.n_classes, config.dice_weight, config.dice_smooth)
+        self.ce_loss = CELoss(config.n_classes, config.ce_weight)
         self.edge_loss = EdgeLoss(config.n_classes, config.edge_weight)
 
     def forward(self, inputs, targets):
-        targets = targets.squeeze(1).long()
         dice_loss = self.dice_loss(inputs, targets)
-        ce_loss = F.cross_entropy(inputs, targets, self.config.ce_weight)
+        ce_loss = self.ce_loss(inputs, targets)
         edge_loss = self.edge_loss(inputs, targets)
         total_loss = self.config.alpha * dice_loss + self.config.beta * ce_loss + self.config.gamma * edge_loss
 
