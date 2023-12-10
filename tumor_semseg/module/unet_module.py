@@ -41,10 +41,10 @@ class UNetModule(L.LightningModule):
         output = self(inputs)
         losses = self.loss_fn(output, target)
 
-        self.log("train_total_loss", losses["total"])
-        self.log("train_dice_loss", losses["dice"])
-        self.log("train_ce_loss", losses["ce"])
-        self.log("train_edge_loss", losses["edge"])
+        self.log("train_total_loss", losses["total"], on_step=True, on_epoch=True)
+        self.log("train_dice_loss", losses["dice"], on_step=True, on_epoch=True)
+        self.log("train_ce_loss", losses["ce"], on_step=True, on_epoch=True)
+        self.log("train_edge_loss", losses["edge"], on_step=True, on_epoch=True)
 
         return losses["total"]
 
@@ -53,10 +53,10 @@ class UNetModule(L.LightningModule):
         output = self(inputs)
         losses = self.loss_fn(output, target)
 
-        self.log("val_total_loss", losses["total"])
-        self.log("val_dice_loss", losses["dice"])
-        self.log("val_ce_loss", losses["ce"])
-        self.log("val_edge_loss", losses["edge"])
+        self.log("val_total_loss", losses["total"], on_step=True, on_epoch=True)
+        self.log("val_dice_loss", losses["dice"], on_step=True, on_epoch=True)
+        self.log("val_ce_loss", losses["ce"], on_step=True, on_epoch=True)
+        self.log("val_edge_loss", losses["edge"], on_step=True, on_epoch=True)
 
         return losses["total"]
 
