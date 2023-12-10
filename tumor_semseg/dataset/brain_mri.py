@@ -97,6 +97,7 @@ class BrainMRIDataModule(L.LightningDataModule):
             batch_size=self.config.batch_size,
             num_workers=self.config.num_workers,
             drop_last=self.config.drop_last,
+            persistent_workers=True,
         )
 
     def val_dataloader(self):
@@ -105,4 +106,5 @@ class BrainMRIDataModule(L.LightningDataModule):
             batch_size=self.config.batch_size,
             num_workers=self.config.num_workers,
             drop_last=self.config.drop_last,
+            persistent_workers=True,
         )
