@@ -70,8 +70,8 @@ class BrainMRIDataModule(L.LightningDataModule):
 
     def setup(self, stage: str):
         if stage == "fit":
-            self.train = BrainMRIDataset(self.x_train, self.y_train, self.config.image_size)
-            self.val = BrainMRIDataset(self.x_val, self.y_val, self.config.image_size)
+            self.train = BrainMRIDataset(self.x_train, self.y_train, self.config.augment, self.config.image_size)
+            self.val = BrainMRIDataset(self.x_val, self.y_val, self.config.augment, self.config.image_size)
 
     def prepare_data(self):
         assert (self.config.dataset_dirpath / "kaggle_3m").exists()
