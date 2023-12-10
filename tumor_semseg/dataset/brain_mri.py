@@ -52,9 +52,9 @@ class BrainMRIDataset(Dataset):
 
     def __getitem__(self, idx):
         image = Image.open(self.images[idx]).convert("RGB").resize(self.image_size, resample=Resampling.BILINEAR)
-        mask = Image.open(self.masks[idx]).resize(self.image_size, resample=Resampling.NEAREST)
+        mask = Image.open(self.masks[idx]).convert("L").resize(self.image_size, resample=Resampling.NEAREST)
         image = np.array(image)
-        mask = np.array(mask).astype(np.float32) / 255.0
+        mask = np.array(mask)
 
         if self.augment:
             augmented = self.augmentation_pipeline(image=image, mask=mask)
