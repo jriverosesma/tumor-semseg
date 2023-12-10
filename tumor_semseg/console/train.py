@@ -21,22 +21,31 @@ def main():
     seed_everything(SEED, workers=True)
 
     # Define problem parameters
-    dataset_dir = Path("data/kaggle_3m")
-    n_classes = 2
+    dataset_dirpath = Path("data")
+    n_classes = 1
 
     # Instantiate configurations module configurations
     unet_config = UNetConfig(n_classes)
     loss_config = DiceCEEdgeLossConfig(n_classes)
     optimizer_config = OptimizerConfig(lr=1e-3)
     unet_module_config = UNetModuleConfig(unet_config, loss_config, optimizer_config)
-    brain_mri_data_module_config = BrainMRIDataModuleConfig(dataset_dir, seed=SEED)
+    brain_mri_data_module_config = BrainMRIDataModuleConfig(dataset_dirpath, seed=SEED, batch_size=32, augment=False)
 
     # Instantiate Lightning modules
     model = UNetModule(unet_module_config)
     taxi_datamodule = BrainMRIDataModule(brain_mri_data_module_config)
 
     # Instantiate trainer
-    trainer = L.Trainer(deterministic=False)
+    trainer = L.Trainer(
+        devices=1,
+        accelerator="gpu",
+        precision="16-mixed",
+        # precision="bf16-mixed", # Preferred over "16-mixed" if supported for the GPU in use
+        # sync_batchnorm=True, # Turn on when using multi-GPU and DDP
+        deterministic=False,
+        max_epochs=500,
+        # profiler="simple",
+    )
 
     # Train
     taxi_datamodule.prepare_data()
