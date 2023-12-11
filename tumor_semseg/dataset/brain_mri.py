@@ -35,8 +35,14 @@ class BrainMRIDataModuleConfig:
 
 class BrainMRIDataset(Dataset):
     def __init__(
-        self, images: list[str], masks: list[str], augment: bool = True, image_size: tuple[int, int] = (256, 256)
+        self,
+        dataset: str,
+        images: list[str],
+        masks: list[str],
+        augment: bool = True,
+        image_size: tuple[int, int] = (256, 256),
     ):
+        self.dataset = dataset
         self.images = images
         self.masks = masks
         self.image_size = image_size
@@ -56,7 +62,7 @@ class BrainMRIDataset(Dataset):
         image = np.array(image)
         mask = np.array(mask)
 
-        if self.augment:
+        if self.augment and self.dataset == "train":
             augmented = self.augmentation_pipeline(image=image, mask=mask)
             image, mask = augmented["image"], augmented["mask"]
 
@@ -70,26 +76,26 @@ class BrainMRIDataModule(L.LightningDataModule):
 
     def setup(self, stage: str):
         if stage == "fit":
-            self.train = BrainMRIDataset(self.x_train, self.y_train, self.config.augment, self.config.image_size)
-            self.val = BrainMRIDataset(self.x_val, self.y_val, self.config.augment, self.config.image_size)
+            assert (self.config.dataset_dirpath / "kaggle_3m").exists()
 
-    def prepare_data(self):
-        assert (self.config.dataset_dirpath / "kaggle_3m").exists()
+            mask_filepaths = glob.glob(str(self.config.dataset_dirpath) + "/kaggle_3m/**/*_mask.tif", recursive=True)
+            image_filepaths = [path.replace("_mask", "") for path in mask_filepaths]
 
-        mask_filepaths = glob.glob(str(self.config.dataset_dirpath) + "/kaggle_3m/**/*_mask.tif", recursive=True)
-        image_filepaths = [path.replace("_mask", "") for path in mask_filepaths]
+            df = pd.DataFrame(data={"image_filepaths": image_filepaths, "mask_filepaths": mask_filepaths})
+            df = df.sort_values("image_filepaths")
+            df["patient"] = df["mask_filepaths"].apply(lambda x: Path(x).parent.name)
+            df["positive"] = df["mask_filepaths"].apply(lambda x: np.any(cv2.imread(x, 0)))
 
-        df = pd.DataFrame(data={"image_filepaths": image_filepaths, "mask_filepaths": mask_filepaths})
-        df = df.sort_values("image_filepaths")
-        df["patient"] = df["mask_filepaths"].apply(lambda x: Path(x).parent.name)
-        df["positive"] = df["mask_filepaths"].apply(lambda x: np.any(cv2.imread(x, 0)))
+            x_train, x_val, y_train, y_val = train_test_split(
+                df["image_filepaths"].values,
+                df["mask_filepaths"].values,
+                test_size=self.config.test_size,
+                random_state=self.config.seed,
+                stratify=df["positive"].values,
+            )
 
-        self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(
-            df["image_filepaths"].values,
-            df["mask_filepaths"].values,
-            test_size=self.config.test_size,
-            random_state=self.config.seed,
-        )
+            self.train = BrainMRIDataset("train", x_train, y_train, self.config.augment, self.config.image_size)
+            self.val = BrainMRIDataset("val", x_val, y_val, self.config.augment, self.config.image_size)
 
     def train_dataloader(self):
         return DataLoader(

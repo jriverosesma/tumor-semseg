@@ -16,44 +16,57 @@ def one_hot_encode(targets: Tensor, n_classes: int):
 
 
 class DiceLoss(nn.Module):
-    def __init__(self, n_classes, weight=None, smooth=1e-6):
+    def __init__(self, weight: Optional[Tensor] = None, smooth: float = 1e-6):
         super().__init__()
-        self.n_classes = n_classes
         self.smooth = smooth
         self.weight = weight
 
-    def forward(self, inputs, targets):
-        inputs = F.softmax(inputs, dim=1)
-        inputs = inputs.view(inputs.size(0), self.n_classes, -1)
+    @staticmethod
+    def compute_dice(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
+        n_classes = inputs.size(1)
+        inputs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
+        inputs = inputs.view(inputs.size(0), n_classes, -1)
 
-        targets_one_hot = one_hot_encode(targets, self.n_classes)
-        targets_one_hot = targets_one_hot.view(targets_one_hot.size(0), self.n_classes, -1)
+        targets_one_hot = one_hot_encode(targets, n_classes)
+        targets_one_hot = targets_one_hot.view(targets_one_hot.size(0), n_classes, -1)
 
         intersection = (inputs * targets_one_hot).sum(-1)
-        union = inputs.sum(-1) + targets_one_hot.sum(-1)
-        dice = (2.0 * intersection + self.smooth) / (union + self.smooth)
+        sum_areas = inputs.sum(-1) + targets_one_hot.sum(-1)
 
+        return (2.0 * intersection + smooth) / (sum_areas + smooth)
+
+    def forward(self, inputs: Tensor, targets: Tensor):
+        dice = DiceLoss.compute_dice(inputs, targets, self.smooth)
         return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
 
 
+class IoULoss(DiceLoss):
+    @staticmethod
+    def compute_iou(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
+        dice = DiceLoss.compute_dice(inputs, targets, smooth)
+        return dice / (2 - dice)
+
+    def forward(self, inputs: Tensor, targets: Tensor):
+        iou = IoULoss.compute_iou(inputs, targets, self.smooth)
+        return (1 - iou).mean() if self.weight is None else (self.weight * (1 - iou)).mean()
+
+
 class CELoss(nn.Module):
-    def __init__(self, n_classes: int, weight=None):
+    def __init__(self, weight: Optional[Tensor] = None):
         super().__init__()
-        self.n_classes = n_classes
         self.weight = weight
 
-    def forward(self, inputs, targets):
-        if self.n_classes == 1:
+    def forward(self, inputs: Tensor, targets: Tensor):
+        if inputs.size(1) == 1:  # Number of classes
             return F.binary_cross_entropy_with_logits(inputs, targets, self.weight)
         else:
             return F.cross_entropy(inputs, targets.squeeze(1).long(), self.weight)
 
 
 class EdgeLoss(nn.Module):
-    def __init__(self, n_classes, weight=None):
+    def __init__(self, weight: Optional[Tensor] = None):
         super().__init__()
         self.weight = weight
-        self.n_classes = n_classes
         self.sobel_x = nn.Conv2d(1, 1, kernel_size=3, padding=1, bias=False)
         self.sobel_y = nn.Conv2d(1, 1, kernel_size=3, padding=1, bias=False)
         sobel_kernel_x = torch.tensor([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]], dtype=torch.float32).view(1, 1, 3, 3)
@@ -61,10 +74,11 @@ class EdgeLoss(nn.Module):
         self.sobel_x.weight = nn.Parameter(sobel_kernel_x, requires_grad=False)
         self.sobel_y.weight = nn.Parameter(sobel_kernel_y, requires_grad=False)
 
-    def forward(self, inputs, targets):
-        targets_one_hot = one_hot_encode(targets, self.n_classes)
+    def forward(self, inputs: Tensor, targets: Tensor):
+        n_classes = inputs.size(1)
+        targets_one_hot = one_hot_encode(targets, n_classes)
         loss = 0.0
-        for class_idx in range(self.n_classes):
+        for class_idx in range(n_classes):
             class_input = inputs[:, class_idx : class_idx + 1, :, :]
             class_target = targets_one_hot[:, class_idx : class_idx + 1, :, :]
             edge_inputs = torch.abs(self.sobel_x(class_input)) + torch.abs(self.sobel_y(class_input))
@@ -77,7 +91,6 @@ class EdgeLoss(nn.Module):
 
 @dataclass
 class DiceCEEdgeLossConfig:
-    n_classes: int
     alpha: float = 0.5
     beta: float = 0.5
     gamma: float = 0.1
@@ -91,11 +104,11 @@ class DiceCEEdgeLoss(nn.Module):
     def __init__(self, config: DiceCEEdgeLossConfig):
         super().__init__()
         self.config = config
-        self.dice_loss = DiceLoss(config.n_classes, config.dice_weight, config.dice_smooth)
-        self.ce_loss = CELoss(config.n_classes, config.ce_weight)
-        self.edge_loss = EdgeLoss(config.n_classes, config.edge_weight)
+        self.dice_loss = DiceLoss(config.dice_weight, config.dice_smooth)
+        self.ce_loss = CELoss(config.ce_weight)
+        self.edge_loss = EdgeLoss(config.edge_weight)
 
-    def forward(self, inputs, targets):
+    def forward(self, inputs: Tensor, targets: Tensor):
         dice_loss = self.dice_loss(inputs, targets)
         ce_loss = self.ce_loss(inputs, targets)
         edge_loss = self.edge_loss(inputs, targets)

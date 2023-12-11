@@ -2,6 +2,7 @@
 data/
 
 # Log
+lightning_logs/
 logs/log_*
 
 # Byte-compiled / optimized / DLL files
