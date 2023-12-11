@@ -30,7 +30,6 @@ def main():
     n_classes = 1
     # Logs
     log_every_n_batches = 16
-    n_pred_samples = 4
 
     # Instantiate configurations
     unet_config = UNetConfig(n_classes)
@@ -48,9 +47,9 @@ def main():
     # Instantiate trainer
     brain_mri_datamodule.setup("fit")
     trainer = L.Trainer(
-        accelerator="cpu",
-        # accelerator="gpu",
-        # precision="16-mixed",
+        # accelerator="cpu",
+        accelerator="gpu",
+        precision="16-mixed",
         # precision="bf16-mixed",  # Preferred over "16-mixed" if supported for the GPU in use
         sync_batchnorm=True,  # Turn on when using multi-GPU and DDP
         deterministic=False,
@@ -61,7 +60,7 @@ def main():
             ModelSummary(max_depth=-1),
             DeviceStatsMonitor(cpu_stats=True),
             ComputeIoUCallback(),
-            PredVisualizationCallback(log_every_n_batches=log_every_n_batches, num_samples=n_pred_samples),
+            PredVisualizationCallback(log_every_n_batches=log_every_n_batches),
         ],
     )
 
