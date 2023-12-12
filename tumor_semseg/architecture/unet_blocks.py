@@ -48,7 +48,7 @@ class Up(nn.Module):
 class Head(nn.Module):
     def __init__(self, in_channels: int, n_classes: int):
         super().__init__()
-        self.head = nn.Conv2d(in_channels, n_classes, kernel_size=1, bias=False)
+        self.head = nn.Conv2d(in_channels, n_classes, kernel_size=1)
 
     def forward(self, x):
         return self.head(x)

@@ -48,10 +48,7 @@ class BrainMRIDataset(Dataset):
         self.image_size = image_size
         self.augment = augment
         self.augmentation_pipeline = get_training_augmentations(image_size)
-        self.image_transform = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])]
-        )
-        self.mask_transform = transforms.ToTensor()
+        self.transform = transforms.ToTensor()
 
     def __len__(self):
         return len(self.images)
@@ -59,14 +56,12 @@ class BrainMRIDataset(Dataset):
     def __getitem__(self, idx):
         image = Image.open(self.images[idx]).convert("RGB").resize(self.image_size, resample=Resampling.BILINEAR)
         mask = Image.open(self.masks[idx]).convert("L").resize(self.image_size, resample=Resampling.NEAREST)
-        image = np.array(image)
-        mask = np.array(mask)
 
         if self.augment and self.dataset == "train":
-            augmented = self.augmentation_pipeline(image=image, mask=mask)
+            augmented = self.augmentation_pipeline(image=np.array(image), mask=np.array(mask))
             image, mask = augmented["image"], augmented["mask"]
 
-        return self.image_transform(image), self.mask_transform(mask)
+        return self.transform(image), self.transform(mask)
 
 
 class BrainMRIDataModule(L.LightningDataModule):
