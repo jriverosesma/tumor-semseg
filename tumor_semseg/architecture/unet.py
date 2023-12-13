@@ -21,7 +21,6 @@ class UNetConfig:
 class UNet(nn.Module):
     def __init__(self, config: UNetConfig):
         super().__init__()
-
         self.in_conv = DoubleConv(config.in_channels, 64, config.activation)
         self.down_conv_1 = Down(64, 128, config.activation)
         self.down_conv_2 = Down(128, 256, config.activation)

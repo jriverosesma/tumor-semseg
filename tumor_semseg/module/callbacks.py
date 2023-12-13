@@ -5,7 +5,7 @@ from torch import Tensor
 from torchvision.utils import make_grid
 
 # Tumor SemSeg
-from tumor_semseg.loss.dice_ce_edge_loss import IoULoss
+from tumor_semseg.loss.semseg_losses import IoULoss
 
 
 class PredVisualizationCallback(L.Callback):

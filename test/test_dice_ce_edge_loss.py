@@ -2,13 +2,7 @@ import torch
 import torch.nn.functional as F
 
 # Tumor SemSeg
-from tumor_semseg.loss.dice_ce_edge_loss import (
-    CrossEntropyLoss,
-    DiceCEEdgeLoss,
-    DiceCEEdgeLossConfig,
-    DiceLoss,
-    EdgeLoss,
-)
+from tumor_semseg.loss.semseg_losses import CrossEntropyLoss, DiceCEEdgeLoss, DiceCEEdgeLossConfig, DiceLoss, EdgeLoss
 
 
 def test_dice_loss():
