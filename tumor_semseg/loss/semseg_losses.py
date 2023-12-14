@@ -41,12 +41,13 @@ class DiceLoss(SemSegLoss):
 
     @staticmethod
     def compute_dice(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
+        n_batches = inputs.size(0)
         n_classes = inputs.size(1)
         inputs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
-        inputs = inputs.view(inputs.size(0), n_classes, -1)
+        inputs = inputs.view(n_batches, n_classes, -1)
 
         targets_one_hot = one_hot_encode(targets, n_classes)
-        targets_one_hot = targets_one_hot.view(targets_one_hot.size(0), n_classes, -1)
+        targets_one_hot = targets_one_hot.view(n_batches, n_classes, -1)
 
         intersection = (inputs * targets_one_hot).sum(-1)
         sum_areas = inputs.sum(-1) + targets_one_hot.sum(-1)
@@ -127,6 +128,31 @@ class FocalLoss(SemSegLoss):
             return torch.mean(F_loss)
         elif self.reduction == "sum":
             return torch.sum(F_loss)
+
+
+class TverskyLoss(SemSegLoss):
+    def __init__(self, alpha: float = 0.5, beta: float = 0.5, smooth: float = 1e-6):
+        super().__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.smooth = smooth
+
+    def _forward(self, inputs, targets):
+        n_batches = inputs.size(0)
+        n_classes = inputs.size(1)
+        inputs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
+        inputs = inputs.view(n_batches, n_classes, -1)
+
+        targets_one_hot = one_hot_encode(targets, n_classes)
+        targets_one_hot = targets_one_hot.view(n_batches, n_classes, -1)
+
+        tp = (inputs * targets_one_hot).sum(dim=-1)
+        fp = ((1 - targets_one_hot) * inputs).sum(dim=-1)
+        fn = (targets_one_hot * (1 - inputs)).sum(dim=-1)
+
+        tversky = (tp + self.smooth) / (tp + self.alpha * fp + self.beta * fn + self.smooth)
+
+        return 1 - tversky.mean()
 
 
 @dataclass
