@@ -1,7 +1,7 @@
 trainer:
   _target_: lightning.Trainer
-  accelerator: gpu
-  devices: null
+  accelerator: "auto"
+  devices: "auto"
   precision: 16-mixed
   # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
   sync_batchnorm: True
