@@ -1,5 +1,6 @@
 # tumor_semseg
-data/
+/data/
+/preds/
 
 # Log
 .aim/
