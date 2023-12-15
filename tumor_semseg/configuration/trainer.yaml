@@ -1,13 +1,13 @@
 trainer:
   _target_: lightning.Trainer
-  accelerator: cpu
-  devices: 1
+  accelerator: gpu
+  devices: null
   precision: 16-mixed
   # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
   sync_batchnorm: True
   deterministic: False
   max_epochs: 500
-  profiler: simple
+  profiler: null
   logger:
     _target_: aim.sdk.adapters.pytorch_lightning.AimLogger
     experiment: ${experiment}
