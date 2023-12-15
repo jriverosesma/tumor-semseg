@@ -1,0 +1,12 @@
+datamodule:
+  _target_: tumor_semseg.data.brain_mri_datamodule.BrainMRIDataModule
+  config:
+    _target_: tumor_semseg.data.brain_mri_datamodule.BrainMRIDataModuleConfig
+    dataset_dirpath:
+      _target_: pathlib.Path
+      _args_: ["${dataset_dirpath}"]
+    seed: ${seed}
+    batch_size: 32
+    augment: True
+    num_workers: 6
+    image_size: [256, 256]

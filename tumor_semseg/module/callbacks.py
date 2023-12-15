@@ -1,3 +1,4 @@
+import aim
 import lightning as L
 import torch
 from lightning.pytorch.utilities import rank_zero_only
@@ -30,13 +31,17 @@ class PredVisualizationCallback(L.Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx % min(self.log_every_n_batches, trainer.num_training_batches - 1) == 0:
             grid = PredVisualizationCallback.generate_pred_grid(batch[0], batch[1], outputs["pred"])
-            trainer.logger.experiment.add_image("train_preds", grid, global_step=trainer.global_step)
+            trainer.logger.experiment.track(
+                aim.Image(grid, caption="Image Training"), name="train", context={"context_key": "train_value"}
+            )
 
     @rank_zero_only
     def on_val_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx % min(self.log_every_n_batches, trainer.num_training_batches - 1) == 0:
             grid = PredVisualizationCallback.generate_pred_grid(batch[0], batch[1], outputs["pred"])
-            trainer.logger.experiment.add_image("val_preds", grid, global_step=trainer.global_step)
+            trainer.logger.experiment.track(
+                aim.Image(grid, caption="Image Validation"), name="val", context={"context_key": "val_value"}
+            )
 
 
 class ComputeIoUCallback(L.Callback):

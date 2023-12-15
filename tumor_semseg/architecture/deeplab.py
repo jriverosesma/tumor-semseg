@@ -26,14 +26,15 @@ class DeepLabv3Version(Enum):
 class DeepLabv3Config:
     n_classes: int
     in_channels: int = 3
-    model_version: DeepLabv3Version = DeepLabv3Version.mobilenet
+    model_version_key: str = "mobilenet"
     pretrained: bool = False
 
 
 class DeepLabv3(nn.Module):
     def __init__(self, config: DeepLabv3Config):
         super().__init__()
-        self.model = config.model_version.value[0](weights=config.model_version.value[1] if config.pretrained else None)
+        model_version = DeepLabv3Version[config.model_version_key]
+        self.model = model_version.value[0](weights=model_version.value[1] if config.pretrained else None)
         if config.pretrained:
             self.model.aux_classifier = None
         self.model.classifier[-1] = nn.Conv2d(256, config.n_classes, kernel_size=(1, 1), stride=(1, 1))

@@ -2,6 +2,7 @@
 data/
 
 # Log
+.aim/
 lightning_logs/
 logs/log_*
 

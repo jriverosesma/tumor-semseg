@@ -1,0 +1,25 @@
+trainer:
+  _target_: lightning.Trainer
+  accelerator: cpu
+  devices: 1
+  precision: 16-mixed
+  # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
+  sync_batchnorm: True
+  deterministic: False
+  max_epochs: 500
+  profiler: simple
+  logger:
+    _target_: aim.sdk.adapters.pytorch_lightning.AimLogger
+    experiment: ${experiment}
+    train_metric_prefix: train_
+    val_metric_prefix: val_
+  callbacks:
+    - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
+      monitor: val_total_loss
+      mode: min
+      min_delta: 1e-4
+    - _target_: lightning.pytorch.callbacks.model_summary.ModelSummary
+      max_depth: -1
+    - _target_: tumor_semseg.module.callbacks.ComputeIoUCallback
+    - _target_: tumor_semseg.module.callbacks.PredVisualizationCallback
+      log_every_n_batches: 16

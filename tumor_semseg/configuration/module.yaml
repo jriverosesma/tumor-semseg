@@ -1,0 +1,26 @@
+defaults:
+  - model: unet
+
+module:
+  _target_: tumor_semseg.module.brain_mri_module.BrainMRIModule
+  config:
+    _target_: tumor_semseg.module.brain_mri_module.BrainMRIModuleConfig
+    model: ${model}
+    loss:
+      _target_: tumor_semseg.loss.semseg_losses.TverskyLoss
+    optimizer:
+      _target_: torch.optim.Adamax
+      lr: 1e-3
+    scheduler:
+      _target_: tumor_semseg.optimizer.base_optimizer.BaseScheduler
+      scheduler_class: torch.optim.lr_scheduler.LambdaLR
+      scheduler_params:
+        lr_lambda: null # TODO
+    bin_det_threshold: 0.5
+    example_input_array_shape:
+      [
+        1,
+        "${model.config.in_channels}",
+        "${model.config.in_channels}",
+        "${datamodule.config.image_size.0}",
+      ]

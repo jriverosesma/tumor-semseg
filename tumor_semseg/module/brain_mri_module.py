@@ -21,7 +21,12 @@ class BrainMRIModuleConfig:
     optimizer: BaseOptimizer
     scheduler: BaseScheduler
     bin_det_threshold: float = 0.5
-    example_input_array_shape: tuple[int, int, int, int] = None
+    example_input_array_shape: Optional[tuple[int, int, int, int]] = None
+
+    def __post_init__(self):
+        # NOTE: OmegaConfg does not currently support `tuple`
+        if self.example_input_array_shape:
+            self.example_input_array_shape = tuple(self.example_input_array_shape)
 
 
 class BrainMRIModule(L.LightningModule):
@@ -32,9 +37,10 @@ class BrainMRIModule(L.LightningModule):
         self.optimizer = config.optimizer
         self.scheduler = config.scheduler
         self.bin_det_threshold = config.bin_det_threshold
-        self.example_input_array = torch.zeros(
-            config.example_input_array_shape
-        )  # Special Lightning attribute to compute I/O size of each layer for model summary
+        if config.example_input_array_shape:
+            self.example_input_array = torch.zeros(
+                config.example_input_array_shape
+            )  # Special Lightning attribute to compute I/O size of each layer for model summary
 
     def forward(self, inputs):
         return self.model(inputs)
@@ -72,6 +78,7 @@ class BrainMRIModule(L.LightningModule):
             "optimizer": optimizer,
             "lr_scheduler": {
                 "scheduler": scheduler,
+                # TODO: Complete this
                 # "monitor": "metric_to_track",
                 # "frequency": "indicates how often the metric is updated"
                 # # If "monitor" references validation metrics, then "frequency" should be set to a
