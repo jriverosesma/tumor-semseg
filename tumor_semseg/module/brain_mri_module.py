@@ -73,11 +73,11 @@ class BrainMRIModule(L.LightningModule):
             return y_hat.argmax(dim=1).float()
 
     def configure_optimizers(self):
-        config = {"optimizer": self.optimizer.get_optimizer()}
+        config = {"optimizer": self.optimizer.get_optimizer(self.model)}
         if self.scheduler:
             config["lr_scheduler"] = {"scheduler": self.scheduler.get_scheduler(config["optimizer"])}
-            if config["lr_scheduler"].params:
-                config["lr_scheduler"] |= config["lr_scheduler"].params
+            if self.scheduler.params:
+                config["lr_scheduler"] |= self.scheduler.params
         return config
 
     def log_loss(self, stage: str, loss: dict[str, Tensor]):

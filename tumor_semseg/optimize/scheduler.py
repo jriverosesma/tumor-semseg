@@ -10,10 +10,10 @@ from torch.optim.lr_scheduler import LambdaLR, LRScheduler, ReduceLROnPlateau
 
 
 class CustomScheduler:
-    def __init__(self, scheduler_class: LRScheduler, args: dict[str, Any]):
+    def __init__(self, scheduler_class: LRScheduler, args: dict[str, Any], params: Optional[dict[str, Any]] = None):
         self.scheduler_class: Type[LRScheduler] = scheduler_class
         self.args: dict[str, Any] = args
-        self.params: Optional[dict[str, Any]] = None
+        self.params: Optional[dict[str, Any]] = params
 
     def get_scheduler(self, optimizer: Optimizer):
         return self.scheduler_class(optimizer, **self.args)
