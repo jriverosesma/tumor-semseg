@@ -11,7 +11,7 @@ module:
     optimizer:
       _target_: tumor_semseg.optimize.optimizer.adamax
     scheduler:
-      _target_: tumor_semseg.optimize.scheduler.lambda_lr
+      _target_: tumor_semseg.optimize.scheduler.reduce_lr_on_plateau
     bin_det_threshold: 0.5
     example_input_array_shape:
       [

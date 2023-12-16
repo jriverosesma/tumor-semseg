@@ -20,7 +20,7 @@ class BrainMRIModuleConfig:
     model: L.LightningModule
     loss: SemSegLoss
     optimizer: CustomOptimizer
-    scheduler: CustomScheduler
+    scheduler: Optional[CustomScheduler] = None
     bin_det_threshold: float = 0.5
     example_input_array_shape: Optional[tuple[int, int, int, int]] = None
 
@@ -73,19 +73,12 @@ class BrainMRIModule(L.LightningModule):
             return y_hat.argmax(dim=1).float()
 
     def configure_optimizers(self):
-        optimizer = self.optimizer.get_optimizer(self.model)
-        scheduler = self.scheduler.get_scheduler(optimizer)
-        return {
-            "optimizer": optimizer,
-            "lr_scheduler": {
-                "scheduler": scheduler,
-                # TODO: Complete this
-                # "monitor": "metric_to_track",
-                # "frequency": "indicates how often the metric is updated"
-                # # If "monitor" references validation metrics, then "frequency" should be set to a
-                # # multiple of "trainer.check_val_every_n_epoch".
-            },
-        }
+        config = {"optimizer": self.optimizer.get_optimizer()}
+        if self.scheduler:
+            config["lr_scheduler"] = {"scheduler": self.scheduler.get_scheduler(config["optimizer"])}
+            if config["lr_scheduler"].params:
+                config["lr_scheduler"] |= config["lr_scheduler"].params
+        return config
 
     def log_loss(self, stage: str, loss: dict[str, Tensor]):
         for loss_name, value in loss.items():
