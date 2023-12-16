@@ -11,15 +11,16 @@ from torch import Tensor
 
 # Tumor SemSeg
 from tumor_semseg.loss.semseg_losses import SemSegLoss
-from tumor_semseg.optimizer.base_optimizer import BaseOptimizer, BaseScheduler
+from tumor_semseg.optimize.optimizer import CustomOptimizer
+from tumor_semseg.optimize.scheduler import CustomScheduler
 
 
 @dataclass
 class BrainMRIModuleConfig:
     model: L.LightningModule
     loss: SemSegLoss
-    optimizer: BaseOptimizer
-    scheduler: BaseScheduler
+    optimizer: CustomOptimizer
+    scheduler: CustomScheduler
     bin_det_threshold: float = 0.5
     example_input_array_shape: Optional[tuple[int, int, int, int]] = None
 

@@ -1,5 +1,5 @@
 defaults:
-  - model: unet
+  - model: deeplab
 
 module:
   _target_: tumor_semseg.module.brain_mri_module.BrainMRIModule
@@ -9,19 +9,14 @@ module:
     loss:
       _target_: tumor_semseg.loss.semseg_losses.TverskyLoss
     optimizer:
-      _target_: tumor_semseg.optimizer.base_optimizer.BaseOptimizer
-      # params:
-      # lr: 1e-3
+      _target_: tumor_semseg.optimize.optimizer.adamax
     scheduler:
-      _target_: tumor_semseg.optimizer.base_optimizer.BaseScheduler
-      # scheduler_class: torch.optim.lr_scheduler.LambdaLR
-      # params:
-      # lr_lambda: null # TODO
+      _target_: tumor_semseg.optimize.scheduler.lambda_lr
     bin_det_threshold: 0.5
     example_input_array_shape:
       [
         1,
         "${model.config.in_channels}",
-        "${model.config.in_channels}",
         "${datamodule.config.image_size.0}",
+        "${datamodule.config.image_size.1}",
       ]

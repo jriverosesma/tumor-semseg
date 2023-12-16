@@ -1,12 +1,17 @@
 defaults:
-  - module
   - datamodule
+  - module
   - trainer
   - hydra
   - _self_
 
-dataset_dirpath: data/kaggle_3m
-n_classes: 1
-in_channels: 3
-experiment: tumorsemseg-v0
 seed: null
+
+datamodule:
+  config:
+    dataset_dirpath:
+      _args_: ["data/kaggle_3m"]
+
+trainer:
+  logger:
+    experiment: tumorsemseg_v1

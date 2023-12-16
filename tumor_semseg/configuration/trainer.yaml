@@ -1,7 +1,7 @@
 trainer:
   _target_: lightning.Trainer
-  accelerator: "auto"
-  devices: "auto"
+  accelerator: auto
+  devices: auto
   precision: 16-mixed
   # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
   sync_batchnorm: True
@@ -10,7 +10,7 @@ trainer:
   profiler: null
   logger:
     _target_: aim.sdk.adapters.pytorch_lightning.AimLogger
-    experiment: ${experiment}
+    experiment: tumorsemseg_v0
     train_metric_prefix: train_
     val_metric_prefix: val_
   callbacks:
