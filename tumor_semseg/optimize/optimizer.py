@@ -18,4 +18,4 @@ class CustomOptimizer:
         return self.optimizer_class(model.parameters(), **self.args)
 
 
-adamax: CustomOptimizer = partial(CustomOptimizer, Adamax, {"lr": 1e-3})
+adamax: CustomOptimizer = partial(CustomOptimizer, Adamax, {"lr": 1e-3, "weight_decay": 1e-4})
