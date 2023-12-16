@@ -14,4 +14,4 @@ datamodule:
 
 trainer:
   logger:
-    experiment: tumorsemseg_v1
+    experiment: tumorsemseg_v0
