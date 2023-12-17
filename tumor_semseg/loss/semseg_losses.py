@@ -149,7 +149,6 @@ class FocalTverskyLoss(FocalLoss):
 
 @dataclass
 class DiceFocalEdgeLossConfig:
-    # TODO: make weights a tensor
     dice: DiceLoss = DiceLoss()
     focal: FocalLoss = FocalLoss()
     edge: EdgeLoss = EdgeLoss()
@@ -159,7 +158,7 @@ class DiceFocalEdgeLossConfig:
 
 
 class DiceFocalEdgeLoss(SemSegLoss):
-    def __init__(self, config: DiceFocalEdgeLossConfig):
+    def __init__(self, config: DiceFocalEdgeLossConfig = DiceFocalEdgeLossConfig()):
         super().__init__()
         self.dice_weight = config.dice_weight
         self.focal_weight = config.focal_weight
