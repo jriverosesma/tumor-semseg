@@ -6,6 +6,7 @@ from tumor_semseg.loss.semseg_losses import (
     CELoss,
     DiceFocalEdgeLoss,
     DiceLoss,
+    EdgeLoss,
     FocalLoss,
     FocalTverskyLoss,
     IoULoss,
@@ -16,18 +17,26 @@ from tumor_semseg.loss.semseg_losses import (
 @pytest.mark.parametrize(
     "loss_fn",
     [
-        (DiceLoss),
-        (IoULoss),
         (CELoss),
+        (DiceFocalEdgeLoss),
+        (DiceLoss),
+        (EdgeLoss),
         (FocalLoss),
         (FocalTverskyLoss),
+        (IoULoss),
         (TverskyLoss),
-        (DiceFocalEdgeLoss),
     ],
 )
 def test_loss(loss_fn):
-    inputs = torch.ones(5, 3, 256, 256)
-    targets = torch.ones(5, 1, 256, 256)
     compute_loss = loss_fn()
 
+    # Binary
+    inputs = torch.ones(5, 1, 256, 256)
+    targets = torch.ones(5, 1, 256, 256)
     assert pytest.approx(compute_loss(inputs, targets)["total"]) == 0
+
+    # Multiclass
+    # inputs = torch.zeros(5, 3, 256, 256)
+    # targets = torch.zeros(5, 1, 256, 256)
+    # inputs[:, 0, ...] = 1
+    # assert pytest.approx(compute_loss(inputs, targets)["total"]) == 0
