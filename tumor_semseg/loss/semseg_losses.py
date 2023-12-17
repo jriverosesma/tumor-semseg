@@ -11,6 +11,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
+# Tumor SemSeg
+from tumor_semseg.loss.utils import compute_dice, compute_iou, one_hot_encode
+
 
 class SemSegLoss(nn.Module, ABC):
     def __init__(self):
@@ -29,45 +32,26 @@ class SemSegLoss(nn.Module, ABC):
             return {"total": loss}
 
 
-def one_hot_encode(targets: Tensor, n_classes: int):
-    return targets if n_classes == 1 else F.one_hot(targets.long(), n_classes).squeeze(1).permute(0, 3, 1, 2).float()
-
-
-class DiceLoss(SemSegLoss):
-    def __init__(self, weight: Optional[Tensor] = None, smooth: float = 1e-6):
+class SimilatiryCoeffLoss(SemSegLoss):
+    def __init__(self, compute_coeff: callable, weight: Optional[Tensor] = None, smooth: float = 1e-6):
         super().__init__()
-        self.smooth = smooth
+        self.compute_coeff = compute_coeff
         self.weight = weight
-
-    @staticmethod
-    def compute_dice(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
-        n_batches = inputs.size(0)
-        n_classes = inputs.size(1)
-        inputs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
-        inputs = inputs.view(n_batches, n_classes, -1)
-
-        targets_one_hot = one_hot_encode(targets, n_classes)
-        targets_one_hot = targets_one_hot.view(n_batches, n_classes, -1)
-
-        intersection = (inputs * targets_one_hot).sum(-1)
-        sum_areas = inputs.sum(-1) + targets_one_hot.sum(-1)
-
-        return (2.0 * intersection + smooth) / (sum_areas + smooth)
+        self.smooth = smooth
 
     def _forward(self, inputs: Tensor, targets: Tensor):
-        dice = DiceLoss.compute_dice(inputs, targets, self.smooth)
+        dice = self.compute_coeff(inputs, targets, self.smooth)
         return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
 
 
-class IoULoss(DiceLoss):
-    @staticmethod
-    def compute_iou(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
-        dice = DiceLoss.compute_dice(inputs, targets, smooth)
-        return dice / (2 - dice)
+class DiceLoss(SimilatiryCoeffLoss):
+    def __init__(self, weight: Optional[Tensor] = None, smooth: float = 1e-6):
+        super().__init__(compute_dice, weight, smooth)
 
-    def _forward(self, inputs: Tensor, targets: Tensor):
-        iou = IoULoss.compute_iou(inputs, targets, self.smooth)
-        return (1 - iou).mean() if self.weight is None else (self.weight * (1 - iou)).mean()
+
+class IoULoss(SimilatiryCoeffLoss):
+    def __init__(self, weight: Optional[Tensor] = None, smooth: float = 1e-6):
+        super().__init__(compute_iou, weight, smooth)
 
 
 class CELoss(SemSegLoss):
@@ -155,18 +139,23 @@ class TverskyLoss(SemSegLoss):
         return 1 - tversky.mean()
 
 
+class FocalTverskyLoss(FocalLoss):
+    def __init__(
+        self, alpha: float = 1.0, gamma: float = 2.0, reduction: str = "mean", tversky: TverskyLoss = TverskyLoss()
+    ):
+        super().__init__(alpha, gamma, reduction)
+        self.ce_loss = tversky
+
+
 @dataclass
 class DiceFocalEdgeLossConfig:
     # TODO: make weights a tensor
-    dice_weight: float = 0.5
-    focal_weight: float = 0.5
-    edge_weight: float = 0.1
-    dice_smooth: float = 1e-6
-    focal_alpha: float = 1.0
-    focal_gamma: float = 2.0
-    focal_reduction: str = "mean"
-    dice_cls_weight: Optional[Tensor] = None
-    edge_cls_weight: Optional[Tensor] = None
+    dice: DiceLoss = DiceLoss()
+    focal: FocalLoss = FocalLoss()
+    edge: EdgeLoss = EdgeLoss()
+    dice_weight: Optional[Tensor] = None
+    focal_weight: Optional[Tensor] = None
+    edge_weight: Optional[Tensor] = None
 
 
 class DiceFocalEdgeLoss(SemSegLoss):
@@ -175,14 +164,14 @@ class DiceFocalEdgeLoss(SemSegLoss):
         self.dice_weight = config.dice_weight
         self.focal_weight = config.focal_weight
         self.edge_weight = config.edge_weight
-        self.dice_loss = DiceLoss(config.dice_cls_weight, config.dice_smooth)
-        self.focal_loss = FocalLoss(config.focal_alpha, config.focal_gamma, config.focal_reduction)
-        self.edge_loss = EdgeLoss(config.edge_cls_weight)
+        self.dice_loss = config.dice
+        self.focal_loss = config.focal
+        self.edge_loss = config.edge
 
     def _forward(self, inputs: Tensor, targets: Tensor):
         dice_loss = self.dice_loss(inputs, targets)["total"]
         focal_loss = self.focal_loss(inputs, targets)["total"]
         edge_loss = self.edge_loss(inputs, targets)["total"]
-        total_loss = self.dice_weight * dice_loss * self.focal_weight * focal_loss + self.edge_weight * edge_loss
+        total_loss = self.dice_weight * dice_loss + self.focal_weight * focal_loss + self.edge_weight * edge_loss
 
         return {"total": total_loss, "dice": dice_loss, "focal": focal_loss, "edge": edge_loss}
