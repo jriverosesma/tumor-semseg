@@ -40,8 +40,8 @@ class SimilatiryCoeffLoss(SemSegLoss):
         self.smooth = smooth
 
     def _forward(self, inputs: Tensor, targets: Tensor):
-        dice = self.compute_coeff(inputs, targets, self.smooth)
-        return (1 - dice).mean() if self.weight is None else (self.weight * (1 - dice)).mean()
+        coeff = self.compute_coeff(inputs, targets, self.smooth)
+        return (1 - coeff).mean() if self.weight is None else (self.weight * (1 - coeff)).mean()
 
 
 class DiceLoss(SimilatiryCoeffLoss):
