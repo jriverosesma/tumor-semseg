@@ -4,4 +4,4 @@ config:
   n_classes: 1
   in_channels: 3
   model_version_key: mobilenet
-  pretrained: False
+  pretrained: false

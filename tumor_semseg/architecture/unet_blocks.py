@@ -32,9 +32,13 @@ class Down(nn.Module):
 
 
 class Up(nn.Module):
-    def __init__(self, in_channels: int, out_channels: int, activation: nn.Module):
+    def __init__(self, in_channels: int, out_channels: int, activation: nn.Module, conv_transpose: bool = True):
         super().__init__()
-        self.up = nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+        self.up = (
+            nn.ConvTranspose2d(in_channels, out_channels, kernel_size=2, stride=2)
+            if conv_transpose
+            else nn.Upsample(scale_factor=2, mode="bilinear", align_corners=True)
+        )
         self.conv = DoubleConv(in_channels, out_channels, activation)
 
     def forward(self, x1, x2):

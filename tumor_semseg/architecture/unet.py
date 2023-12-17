@@ -16,21 +16,22 @@ class UNetConfig:
     n_classes: int
     in_channels: int = 3
     activation: nn.Module = nn.ReLU(inplace=True)
+    conv_transpose: bool = True
 
 
 class UNet(nn.Module):
     def __init__(self, config: UNetConfig):
         super().__init__()
-        self.in_conv = DoubleConv(config.in_channels, 64, config.activation)
-        self.down_conv_1 = Down(64, 128, config.activation)
-        self.down_conv_2 = Down(128, 256, config.activation)
-        self.down_conv_3 = Down(256, 512, config.activation)
-        self.down_conv_4 = Down(512, 1024, config.activation)
-        self.up_conv1 = Up(1024 + 512, 512, config.activation)
-        self.up_conv2 = Up(512 + 256, 256, config.activation)
-        self.up_conv3 = Up(256 + 128, 128, config.activation)
-        self.up_conv4 = Up(128 + 64, 64, config.activation)
-        self.head = Head(64, config.n_classes)
+        self.in_conv = DoubleConv(config.in_channels, 32, config.activation)
+        self.down_conv_1 = Down(32, 64, config.activation)
+        self.down_conv_2 = Down(64, 128, config.activation)
+        self.down_conv_3 = Down(128, 256, config.activation)
+        self.down_conv_4 = Down(256, 512, config.activation)
+        self.up_conv1 = Up(512 + 256, 256, config.activation)
+        self.up_conv2 = Up(256 + 128, 128, config.activation)
+        self.up_conv3 = Up(128 + 64, 64, config.activation)
+        self.up_conv4 = Up(64 + 32, 32, config.activation)
+        self.head = Head(32, config.n_classes)
 
     def forward(self, x):
         x1 = self.in_conv(x)

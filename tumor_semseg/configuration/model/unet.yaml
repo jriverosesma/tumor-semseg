@@ -6,3 +6,4 @@ config:
   activation:
     _target_: torch.nn.ReLU
     inplace: true
+  conv_transpose: true
