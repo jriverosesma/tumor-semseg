@@ -9,11 +9,11 @@ from tumor_semseg.architecture.unet import UNet, UNetConfig
 @pytest.mark.parametrize(
     "input_shape, config",
     [
-        ((5, 3, 256, 256), UNetConfig(10, 3, nn.ReLU(inplace=True))),
-        ((1, 3, 256, 256), UNetConfig(5, 3, nn.ReLU(inplace=True))),
-        ((10, 1, 256, 256), UNetConfig(7, 1, nn.Sigmoid())),
-        ((10, 1, 64, 64), UNetConfig(4, 1, nn.Sigmoid())),
-        ((10, 1, 256, 128), UNetConfig(1, 1, nn.Sigmoid())),
+        ((5, 3, 256, 256), UNetConfig(10, 3, nn.ReLU(inplace=True), True)),
+        ((1, 3, 256, 256), UNetConfig(5, 3, nn.ReLU(inplace=True), False)),
+        ((10, 1, 256, 256), UNetConfig(7, 1, nn.Sigmoid(), True)),
+        ((10, 1, 64, 64), UNetConfig(4, 1, nn.Sigmoid(), False)),
+        ((10, 1, 256, 128), UNetConfig(1, 1, nn.Sigmoid(), True)),
     ],
 )
 def test_unet(input_shape, config):

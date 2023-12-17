@@ -16,7 +16,7 @@ class UNetConfig:
     n_classes: int
     in_channels: int = 3
     activation: nn.Module = nn.ReLU(inplace=True)
-    conv_transpose: bool = True
+    bilinear: bool = False
 
 
 class UNet(nn.Module):
@@ -27,10 +27,10 @@ class UNet(nn.Module):
         self.down_conv_2 = Down(64, 128, config.activation)
         self.down_conv_3 = Down(128, 256, config.activation)
         self.down_conv_4 = Down(256, 512, config.activation)
-        self.up_conv1 = Up(512 + 256, 256, config.activation)
-        self.up_conv2 = Up(256 + 128, 128, config.activation)
-        self.up_conv3 = Up(128 + 64, 64, config.activation)
-        self.up_conv4 = Up(64 + 32, 32, config.activation)
+        self.up_conv1 = Up(512, 256, config.activation, config.bilinear)
+        self.up_conv2 = Up(256, 128, config.activation, config.bilinear)
+        self.up_conv3 = Up(128, 64, config.activation, config.bilinear)
+        self.up_conv4 = Up(64, 32, config.activation, config.bilinear)
         self.head = Head(32, config.n_classes)
 
     def forward(self, x):
