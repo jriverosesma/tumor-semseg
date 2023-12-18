@@ -49,7 +49,7 @@ class ComputeIoUCallback(L.Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
         y_hat = outputs["pred"]
-        iou = compute_iou(y_hat, y)
+        iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"train_IoU_class_{class_idx}", class_iou, sync_dist=True)
@@ -58,7 +58,7 @@ class ComputeIoUCallback(L.Callback):
     def on_val_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
         y_hat = outputs["pred"]
-        iou = compute_iou(y_hat, y)
+        iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"val_IoU_class_{class_idx}", class_iou, sync_dist=True)
