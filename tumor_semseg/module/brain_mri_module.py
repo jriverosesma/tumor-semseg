@@ -88,6 +88,7 @@ class BrainMRIModule(L.LightningModule):
                 f"{stage}_{loss_name}_loss",
                 value,
                 sync_dist=True,
-                prog_bar=True if "total" in loss_name else False,
+                prog_bar=True if loss_name == "total" else False,
+                on_step=False,
                 on_epoch=True,
             )

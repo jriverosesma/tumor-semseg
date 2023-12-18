@@ -82,7 +82,7 @@ class ComputeIoUCallback(L.Callback):
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"train_IoU_class_{class_idx}", class_iou, sync_dist=True)
-        pl_module.log("train_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True)
+        pl_module.log("train_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True, on_step=True)
 
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
@@ -91,4 +91,4 @@ class ComputeIoUCallback(L.Callback):
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"val_IoU_class_{class_idx}", class_iou, sync_dist=True)
-        pl_module.log("val_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True)
+        pl_module.log("val_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True, on_step=True)
