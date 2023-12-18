@@ -56,10 +56,7 @@ class PredVisualizationCallback(L.Callback):
                 )
                 plt.close()
                 trainer.logger.experiment.track(
-                    aim.Image(fig),
-                    name="image",
-                    epoch=trainer.current_epoch,
-                    context={"subset": "train"},
+                    aim.Image(fig), name="image", epoch=trainer.current_epoch, context={"subset": "train"}
                 )
 
     @rank_zero_only
@@ -69,6 +66,7 @@ class PredVisualizationCallback(L.Callback):
                 fig = PredVisualizationCallback.generate_pred_visualization(
                     batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
                 )
+                plt.close()
                 trainer.logger.experiment.track(
                     aim.Image(fig), name="image", epoch=trainer.current_epoch, context={"subset": "val"}
                 )
