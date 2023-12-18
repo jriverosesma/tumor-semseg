@@ -19,22 +19,30 @@ class PredVisualizationCallback(L.Callback):
 
     @staticmethod
     def generate_pred_visualization(x: Tensor, y: Tensor, y_hat: Tensor, bin_det_threshold: float):
-        norm_image = (x - x.min()) / (x.max() - x.min())
-        norm_image = 255 * norm_image.permute(1, 2, 0)
-        mask = 255 * y
-        pred = y_hat.float().detach().numpy().squeeze(0)
+        iou = float(compute_iou(y_hat.unsqueeze(0), y.unsqueeze(0)).detach())
+
+        x_np = x.float().numpy()
+        y_np = y.float().numpy()
+        y_hat_np = y_hat.sigmoid().float().detach().numpy()
+
+        norm_image = (x_np - x_np.min()) / (x_np.max() - x_np.min())
+        norm_image = 255 * norm_image.transpose(1, 2, 0)
+        mask = 255 * y_np
+        pred = y_hat_np.squeeze(0)
         tpred = np.zeros(pred.shape)
-        tpred[pred > bin_det_threshold] = 1.0
+        tpred[pred > bin_det_threshold] = 255.0
+        pred *= 255
 
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
 
-        ax[0, 0].imshow(norm_image)
+        fig.suptitle(f"IoU: {np.round(iou, 2)}")
+        ax[0, 0].imshow(norm_image.astype(np.uint8))
         ax[0, 0].set_title("image")
-        ax[0, 1].imshow(mask)
+        ax[0, 1].imshow(mask.astype(np.uint8))
         ax[0, 1].set_title("mask")
-        ax[1, 0].imshow(pred)
+        ax[1, 0].imshow(pred.astype(np.uint8))
         ax[1, 0].set_title("prediction")
-        ax[1, 1].imshow(tpred)
+        ax[1, 1].imshow(tpred.astype(np.uint8))
         ax[1, 1].set_title("thresholded prediction")
 
         return fig
