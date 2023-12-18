@@ -7,6 +7,6 @@ datamodule:
       _args_: ["data/kaggle_3m"]
     seed: ${seed}
     batch_size: 32
-    augment: True
+    augment: true
     num_workers: 6
     image_size: [256, 256]
