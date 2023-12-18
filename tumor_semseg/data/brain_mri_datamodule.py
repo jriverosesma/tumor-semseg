@@ -61,7 +61,7 @@ class BrainMRIDataset(Dataset):
 
         transformed = self.transform(image=image, mask=mask)
 
-        return transformed["image"], transformed["mask"].unsqueeze(0) / 255.0  # TODO: remove this squeeze?
+        return transformed["image"], transformed["mask"] / 255.0
 
 
 class BrainMRIDataModule(L.LightningDataModule):
