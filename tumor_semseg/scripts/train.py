@@ -21,6 +21,7 @@ def main(cfg: DictConfig):
     brain_mri_model: BrainMRIModule = instantiate(cfg.module)
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)
+
     trainer.logger.log_hyperparams(cfg)
 
     trainer.fit(brain_mri_model, datamodule=brain_mri_datamodule)
