@@ -3,6 +3,7 @@ import aim
 import lightning as L
 import matplotlib.pyplot as plt
 import numpy as np
+import torch
 import torch.nn.functional as F
 from lightning.pytorch.utilities import rank_zero_only
 from torch import Tensor
@@ -52,7 +53,7 @@ class PredVisualizationCallback(L.Callback):
         if batch_idx % min(self.log_every_n_batches, trainer.num_training_batches) == 0:
             for i in range(min(self.num_samples, batch[0].size(0))):
                 fig = PredVisualizationCallback.generate_pred_visualization(
-                    batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
+                    batch[0][i], batch[1][i], outputs["preds"][i], pl_module.bin_det_threshold
                 )
                 trainer.logger.experiment.track(
                     aim.Image(fig), name="image", epoch=trainer.current_epoch, context={"subset": "train"}
@@ -64,7 +65,7 @@ class PredVisualizationCallback(L.Callback):
         if batch_idx % min(self.log_every_n_batches, trainer.num_val_batches[0]) == 0:
             for i in range(min(self.num_samples, batch[0].size(0))):
                 fig = PredVisualizationCallback.generate_pred_visualization(
-                    batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
+                    batch[0][i], batch[1][i], outputs["preds"][i], pl_module.bin_det_threshold
                 )
                 trainer.logger.experiment.track(
                     aim.Image(fig), name="image", epoch=trainer.current_epoch, context={"subset": "val"}
@@ -75,7 +76,7 @@ class PredVisualizationCallback(L.Callback):
 class ComputeIoUCallback(L.Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
-        y_hat = pl_module.predict_step(batch, batch_idx)
+        y_hat = torch.where(outputs["preds"] > pl_module.bin_det_threshold, 1.0, 0.0)
         iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):
@@ -84,7 +85,7 @@ class ComputeIoUCallback(L.Callback):
 
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
-        y_hat = pl_module.predict_step(batch, batch_idx)
+        y_hat = torch.where(outputs["preds"] > pl_module.bin_det_threshold, 1.0, 0.0)
         iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):

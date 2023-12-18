@@ -55,7 +55,7 @@ class BrainMRIModule(L.LightningModule):
 
         self.log_loss("train", loss)
 
-        return {"loss": loss["total"], "pred": y_hat}
+        return {"loss": loss["total"], "preds": y_hat}
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
@@ -64,7 +64,7 @@ class BrainMRIModule(L.LightningModule):
 
         self.log_loss("val", loss)
 
-        return {"loss": loss["total"], "pred": y_hat}
+        return {"loss": loss["total"], "preds": y_hat}
 
     def predict_step(self, batch, batch_idx):
         x, _ = batch
