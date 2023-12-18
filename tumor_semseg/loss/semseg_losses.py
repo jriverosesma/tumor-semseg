@@ -62,7 +62,7 @@ class DiceLoss(SimilatiryCoeffLoss):
         self,
         params: dict[str, Any] = {},
         weight: Optional[Tensor] = None,
-        class_reduction: str = "mean",
+        class_reduction: str = "none",
         batch_reduction: str = "mean",
     ):
         super().__init__(compute_dice, params, weight, class_reduction, batch_reduction)
@@ -73,7 +73,7 @@ class IoULoss(SimilatiryCoeffLoss):
         self,
         params: dict[str, Any] = {},
         weight: Optional[Tensor] = None,
-        class_reduction: str = "mean",
+        class_reduction: str = "none",
         batch_reduction: str = "mean",
     ):
         super().__init__(compute_iou, params, weight, class_reduction, batch_reduction)
@@ -84,7 +84,7 @@ class TverskyLoss(SimilatiryCoeffLoss):
         self,
         params: dict[str, Any] = {},
         weight: Optional[Tensor] = None,
-        class_reduction: str = "mean",
+        class_reduction: str = "none",
         batch_reduction: str = "mean",
     ):
         super().__init__(compute_tversky, params, weight, class_reduction, batch_reduction)
@@ -107,7 +107,7 @@ class CELoss(SemSegLoss):
 
 class FocalLoss(SemSegLoss):
     def __init__(
-        self, alpha: float = 1.0, gamma: float = 2.0, class_reduction: str = "mean", batch_reduction: str = "mean"
+        self, alpha: float = 1.0, gamma: float = 2.0, class_reduction: str = "none", batch_reduction: str = "mean"
     ):
         super().__init__()
         self.alpha = alpha
