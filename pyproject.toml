@@ -39,6 +39,9 @@ all = ["black", "bumpver", "isort", "flake8", "pre-commit", "pip-licenses", "pyt
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.poetry.scripts]
+train = "tumor_semseg.scripts.train:main"
+
 [tool.black]
 line-length = 120
 
@@ -46,8 +49,9 @@ line-length = 120
 profile = "black"
 line_length = 120
 known_first_party = ["tumor_semseg"]
-import_heading_firstparty = "Tumor SemSeg"
-
+import_heading_stdlib = "Standard"
+import_heading_thirdparty = "Third-Party"
+import_heading_firstparty = "TumorSemSeg"
 
 [tool.bumpver]
 current_version = "v0.1.0"

@@ -2,15 +2,17 @@
 This file contains the definition of the Dice-CE-Edge Loss for semantic segmentation tasks.
 """
 
+# Standard
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Optional
 
+# Third-Party
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch import Tensor
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.loss.utils import compute_dice, compute_iou, compute_tversky, one_hot_encode, reduce
 
 

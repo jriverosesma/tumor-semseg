@@ -3,11 +3,13 @@ UNet model architecture definition.
 Mainly based on UNet implementation of: https://github.com/milesial/Pytorch-UNet
 """
 
+# Standard
 from dataclasses import dataclass
 
+# Third-Party
 import torch.nn as nn
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.architecture.unet_blocks import DoubleConv, Down, Head, Up
 
 

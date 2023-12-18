@@ -1,8 +1,9 @@
+# Third-Party
 import pytest
 import torch
 from torch import nn
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.architecture.unet import UNet, UNetConfig
 
 

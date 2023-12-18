@@ -1,8 +1,8 @@
+# Third-Party
 import pytest
 import torch
-from torch import nn
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.architecture.deeplab import DeepLabv3, DeepLabv3Config
 
 

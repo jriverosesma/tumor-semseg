@@ -2,12 +2,13 @@
 This files defines the entry point for training.
 """
 
+# Third-Party
 import hydra
 from hydra.utils import instantiate
 from lightning.pytorch import Trainer, seed_everything
 from omegaconf import DictConfig
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.data.brain_mri_datamodule import BrainMRIDataModule
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
 

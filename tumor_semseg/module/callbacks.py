@@ -1,3 +1,4 @@
+# Third-Party
 import aim
 import lightning as L
 import torch
@@ -5,7 +6,7 @@ from lightning.pytorch.utilities import rank_zero_only
 from torch import Tensor
 from torchvision.utils import make_grid
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.loss.utils import compute_iou
 
 

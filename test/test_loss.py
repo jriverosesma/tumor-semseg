@@ -1,7 +1,8 @@
+# Third-Party
 import pytest
 import torch
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.loss.semseg_losses import CELoss, DiceLoss, FocalLoss, IoULoss, TverskyLoss
 
 

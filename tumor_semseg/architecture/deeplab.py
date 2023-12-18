@@ -2,9 +2,11 @@
 DeepLabv3 model architercture definition.
 """
 
+# Standard
 from dataclasses import dataclass
 from enum import Enum
 
+# Third-Party
 import torch.nn as nn
 from torchvision.models.segmentation import (
     DeepLabV3_MobileNet_V3_Large_Weights,

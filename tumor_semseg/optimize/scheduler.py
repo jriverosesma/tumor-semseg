@@ -2,9 +2,11 @@
 Definition of custom schedulers.
 """
 
+# Standard
 from functools import partial
 from typing import Any, Optional, Type
 
+# Third-Party
 from torch.optim import Optimizer
 from torch.optim.lr_scheduler import LambdaLR, LRScheduler, ReduceLROnPlateau
 

@@ -2,9 +2,11 @@
 Definition of custom optimizers.
 """
 
+# Standard
 from functools import partial
 from typing import Any, Type
 
+# Third-Party
 import torch
 from torch.optim import Adamax, Optimizer
 

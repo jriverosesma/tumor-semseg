@@ -2,11 +2,13 @@
 This file defines the data module for the Brain MRI data.
 """
 
+# Standard
 import glob
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+# Third-Party
 import albumentations as A
 import cv2
 import lightning as L
@@ -18,7 +20,7 @@ from PIL.Image import Resampling
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 
-# Tumor SemSeg
+# TumorSemSeg
 from tumor_semseg.data.augmentations import get_weak_augmentations
 
 
