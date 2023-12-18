@@ -63,7 +63,7 @@ class PredVisualizationCallback(L.Callback):
 
     @rank_zero_only
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-        if batch_idx % min(self.log_every_n_batches, trainer.num_val_batches) == 0:
+        if batch_idx % min(self.log_every_n_batches, trainer.num_val_batches[0]) == 0:
             for i in range(min(self.num_samples, batch[0].size(0))):
                 fig = PredVisualizationCallback.generate_pred_visualization(
                     batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
