@@ -75,7 +75,7 @@ class PredVisualizationCallback(L.Callback):
 class ComputeIoUCallback(L.Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
-        y_hat = outputs["pred"]
+        y_hat = pl_module.predict_step(batch, batch_idx)
         iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):
@@ -84,7 +84,7 @@ class ComputeIoUCallback(L.Callback):
 
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
-        y_hat = outputs["pred"]
+        y_hat = pl_module.predict_step(batch, batch_idx)
         iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):

@@ -25,13 +25,12 @@ def one_hot_encode(targets: Tensor, n_classes: int):
 def compute_dice(inputs: Tensor, targets: Tensor, smooth: float = 1e-6):
     n_batches = inputs.size(0)
     n_classes = inputs.size(1)
-    input_probs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
-    input_probs = input_probs.view(n_batches, n_classes, -1)
+    inputs = inputs.view(n_batches, n_classes, -1)
 
     targets_one_hot = one_hot_encode(targets, n_classes).view(n_batches, n_classes, -1)
 
-    intersection = (input_probs * targets_one_hot).sum(-1)
-    sum_areas = (input_probs + targets_one_hot).sum(-1)
+    intersection = (inputs * targets_one_hot).sum(-1)
+    sum_areas = (inputs + targets_one_hot).sum(-1)
 
     return (2.0 * intersection + smooth) / (sum_areas + smooth)
 
@@ -44,14 +43,13 @@ def compute_iou(inputs: Tensor, targets: Tensor, smooth: float = 1e-10):
 def compute_tversky(inputs: Tensor, targets: Tensor, alpha: float = 0.5, beta: float = 0.5, smooth: float = 1e-6):
     n_batches = inputs.size(0)
     n_classes = inputs.size(1)
-    input_probs = inputs.sigmoid() if n_classes == 1 else inputs.softmax(dim=1)
-    input_probs = input_probs.view(n_batches, n_classes, -1)
+    inputs = inputs.view(n_batches, n_classes, -1)
 
     targets_one_hot = one_hot_encode(targets, n_classes)
     targets_one_hot = targets_one_hot.view(n_batches, n_classes, -1)
 
-    tp = (input_probs * targets_one_hot).sum(dim=-1)
-    fp = ((1 - targets_one_hot) * input_probs).sum(dim=-1)
-    fn = (targets_one_hot * (1 - input_probs)).sum(dim=-1)
+    tp = (inputs * targets_one_hot).sum(dim=-1)
+    fp = ((1 - targets_one_hot) * inputs).sum(dim=-1)
+    fn = (targets_one_hot * (1 - inputs)).sum(dim=-1)
 
     return (tp + smooth) / (tp + alpha * fp + beta * fn + smooth)

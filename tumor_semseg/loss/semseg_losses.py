@@ -50,7 +50,8 @@ class SimilatiryCoeffLoss(SemSegLoss):
         self.batch_reduction = batch_reduction
 
     def _forward(self, inputs: Tensor, targets: Tensor):
-        coeff = self.compute_coeff(inputs, targets, **self.params)
+        input_probs = inputs.sigmoid() if inputs.size(1) == 1 else inputs.softmax(dim=1)
+        coeff = self.compute_coeff(input_probs, targets, **self.params)
         loss = (1 - coeff) if self.weight is None else self.weight * (1 - coeff)
 
         loss = reduce(loss, dims=[-1], reduction=self.class_reduction)
@@ -135,3 +136,17 @@ class FocalLoss(SemSegLoss):
         focal_loss = reduce(focal_loss, reduction=self.batch_reduction)
 
         return focal_loss
+
+
+class TverskyFocalLoss(SemSegLoss):
+    def __init__(self, tversky: TverskyLoss = TverskyLoss(), focal: FocalLoss = FocalLoss()):
+        super().__init__()
+        self.tversky = tversky
+        self.focal = focal
+
+    def _forward(self, inputs: Tensor, targets: Tensor):
+        tvsersky_loss = self.tversky(inputs, targets)["total"]
+        focal_loss = self.focal(inputs, targets)["total"]
+        total_loss = tvsersky_loss + focal_loss
+
+        return {"tversky": tvsersky_loss, "focal": focal_loss, "total": total_loss}

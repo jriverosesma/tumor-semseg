@@ -3,12 +3,12 @@ import pytest
 import torch
 
 # TumorSemSeg
-from tumor_semseg.loss.semseg_losses import CELoss, DiceLoss, FocalLoss, IoULoss, TverskyLoss
+from tumor_semseg.loss.semseg_losses import CELoss, DiceLoss, FocalLoss, IoULoss, TverskyFocalLoss, TverskyLoss
 
 
 @pytest.mark.parametrize(
     "loss_fn",
-    [(CELoss), (DiceLoss), (FocalLoss), (IoULoss), (TverskyLoss)],
+    [(CELoss), (DiceLoss), (FocalLoss), (IoULoss), (TverskyFocalLoss), (TverskyLoss)],
 )
 def test_loss(loss_fn):
     compute_loss = loss_fn()
