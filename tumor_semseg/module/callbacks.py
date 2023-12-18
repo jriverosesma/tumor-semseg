@@ -21,9 +21,9 @@ class PredVisualizationCallback(L.Callback):
     def generate_pred_visualization(x: Tensor, y: Tensor, y_hat: Tensor, bin_det_threshold: float):
         iou = float(compute_iou(y_hat.unsqueeze(0), y.unsqueeze(0)).detach())
 
-        x_np = x.float().numpy()
-        y_np = y.float().numpy()
-        y_hat_np = y_hat.sigmoid().float().detach().numpy()
+        x_np = x.float().cpu().numpy()
+        y_np = y.float().cpu().numpy()
+        y_hat_np = y_hat.sigmoid().float().detach().cpu().numpy()
 
         norm_image = (x_np - x_np.min()) / (x_np.max() - x_np.min())
         norm_image = 255 * norm_image.transpose(1, 2, 0)
@@ -55,7 +55,11 @@ class PredVisualizationCallback(L.Callback):
                     batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
                 )
                 trainer.logger.experiment.track(
-                    aim.Image(fig, caption="Image Training"), name="train", context={"context_key": "train_value"}
+                    aim.Image(fig),
+                    name="image",
+                    epoch=trainer.current_epoch,
+                    step=batch_idx,
+                    context={"subset": "train"},
                 )
 
     @rank_zero_only
@@ -66,7 +70,7 @@ class PredVisualizationCallback(L.Callback):
                     batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
                 )
                 trainer.logger.experiment.track(
-                    aim.Image(fig, caption="Image Validation"), name="train", context={"context_key": "val_value"}
+                    aim.Image(fig), name="image", epoch=trainer.current_epoch, step=batch_idx, context={"subset": "val"}
                 )
 
 
