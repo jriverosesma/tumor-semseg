@@ -6,7 +6,7 @@ trainer:
   # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
   sync_batchnorm: true
   deterministic: false
-  max_epochs: 500
+  max_epochs: 160
   profiler: null
   logger:
     _target_: aim.sdk.adapters.pytorch_lightning.AimLogger
