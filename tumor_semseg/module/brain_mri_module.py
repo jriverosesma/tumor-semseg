@@ -85,5 +85,9 @@ class BrainMRIModule(L.LightningModule):
     def log_loss(self, stage: str, loss: dict[str, Tensor]):
         for loss_name, value in loss.items():
             self.log(
-                f"{stage}_{loss_name}_loss", value, sync_dist=True, prog_bar=True if loss_name == "total" else False
+                f"{stage}_{loss_name}_loss",
+                value,
+                sync_dist=True,
+                prog_bar=True if "total" in loss_name else False,
+                on_epoch=True,
             )

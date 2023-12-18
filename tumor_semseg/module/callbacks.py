@@ -54,6 +54,7 @@ class PredVisualizationCallback(L.Callback):
                 fig = PredVisualizationCallback.generate_pred_visualization(
                     batch[0][i], batch[1][i], outputs["pred"][i], pl_module.bin_det_threshold
                 )
+                plt.close()
                 trainer.logger.experiment.track(
                     aim.Image(fig),
                     name="image",
@@ -81,7 +82,7 @@ class ComputeIoUCallback(L.Callback):
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"train_IoU_class_{class_idx}", class_iou, sync_dist=True)
-        pl_module.log("train_mIoU", iou.mean(), sync_dist=True, prog_bar=True)
+        pl_module.log("train_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True)
 
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         _, y = batch
@@ -90,4 +91,4 @@ class ComputeIoUCallback(L.Callback):
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"val_IoU_class_{class_idx}", class_iou, sync_dist=True)
-        pl_module.log("val_mIoU", iou.mean(), sync_dist=True, prog_bar=True)
+        pl_module.log("val_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True)
