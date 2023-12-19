@@ -70,9 +70,9 @@ class BrainMRIModule(L.LightningModule):
         x, _ = batch
         y_hat = self(x)
         if y_hat.size(1) == 1:
-            return (y_hat.sigmoid() > self.bin_det_threshold).float()
+            return (y_hat.sigmoid() > self.bin_det_threshold).float(), batch
         else:
-            return y_hat.argmax(dim=1).float()
+            return y_hat.argmax(dim=1).float(), batch
 
     def configure_optimizers(self):
         config = {"optimizer": self.optimizer.get_optimizer(self.model)}
