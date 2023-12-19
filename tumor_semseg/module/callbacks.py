@@ -4,7 +4,6 @@ import lightning as L
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
-import torch.nn.functional as F
 from lightning.pytorch.utilities import rank_zero_only
 from torch import Tensor
 
@@ -20,18 +19,20 @@ class PredVisualizationCallback(L.Callback):
 
     @staticmethod
     def generate_pred_visualization(x: Tensor, y: Tensor, y_hat: Tensor, bin_det_threshold: float):
-        iou = float(compute_iou(y_hat.unsqueeze(0), y.unsqueeze(0)).detach())
+        y_hat = y_hat.sigmoid().detach()
+        y_hat_t = torch.where(y_hat > bin_det_threshold, 1.0, 0.0)
+        iou = float(compute_iou(y_hat_t.unsqueeze(0), y))
 
+        y_hat_np = y_hat.float().cpu().numpy()
+        y_hat_t_np = y_hat_t.float().cpu().numpy()
         x_np = x.float().cpu().numpy()
         y_np = y.float().cpu().numpy()
-        y_hat_np = y_hat.sigmoid().float().detach().cpu().numpy()
 
         norm_image = (x_np - x_np.min()) / (x_np.max() - x_np.min())
         norm_image = 255 * norm_image.transpose(1, 2, 0)
         mask = 255 * y_np
         pred = y_hat_np.squeeze(0)
-        tpred = np.zeros(pred.shape)
-        tpred[pred > bin_det_threshold] = 255.0
+        tpred = y_hat_t_np.squeeze(0)
         pred *= 255
 
         fig, ax = plt.subplots(nrows=2, ncols=2, figsize=(10, 10))
