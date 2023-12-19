@@ -25,12 +25,12 @@ def main(cfg: DictConfig):
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)
 
-    trainer.logger.log_hyperparams(cfg)
-
     if cfg.find_initial_lr:
         tuner = Tuner(trainer)
         tuner.lr_find(brain_mri_model, brain_mri_datamodule)
         trainer = instantiate(cfg.trainer)  # Need to be reinstantiated when training on GPU
+
+    trainer.logger.log_hyperparams(cfg)
 
     trainer.fit(brain_mri_model, datamodule=brain_mri_datamodule)
 
