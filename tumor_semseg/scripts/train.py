@@ -6,6 +6,7 @@ This files defines the entry point for training.
 import hydra
 from hydra.utils import instantiate
 from lightning.pytorch import Trainer, seed_everything
+from lightning.pytorch.tuner import Tuner
 from omegaconf import DictConfig
 
 # TumorSemSeg
@@ -25,6 +26,10 @@ def main(cfg: DictConfig):
     trainer: Trainer = instantiate(cfg.trainer)
 
     trainer.logger.log_hyperparams(cfg)
+
+    if cfg.find_initial_lr:
+        tuner = Tuner(trainer)
+        tuner.lr_find(brain_mri_model, brain_mri_datamodule)
 
     trainer.fit(brain_mri_model, datamodule=brain_mri_datamodule)
 

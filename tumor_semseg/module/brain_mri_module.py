@@ -44,6 +44,7 @@ class BrainMRIModule(L.LightningModule):
             self.example_input_array = torch.zeros(
                 config.example_input_array_shape
             )  # Special Lightning attribute to compute I/O size of each layer for model summary
+        self.lr = None  # For initial LR tuning only
 
     def forward(self, inputs):
         return self.model(inputs)
@@ -75,6 +76,9 @@ class BrainMRIModule(L.LightningModule):
             return y_hat.argmax(dim=1).float(), batch
 
     def configure_optimizers(self):
+        # For initial LR tuning
+        if self.lr is not None:
+            self.optimizer.args["lr"] = self.lr
         config = {"optimizer": self.optimizer.get_optimizer(self.model)}
         if self.scheduler:
             config["lr_scheduler"] = {"scheduler": self.scheduler.get_scheduler(config["optimizer"])}
