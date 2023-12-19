@@ -30,7 +30,7 @@ class BrainMRIDataModuleConfig:
     seed: Optional[int] = None
     test_size: float = 0.1
     image_size: tuple[int, int] = field(default_factory=lambda: (256, 256))  # HxW
-    batch_size: int = 8
+    batch_size: int = 32
     num_workers: int = 1
     augment: bool = True
     drop_last: bool = False
