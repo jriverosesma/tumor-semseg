@@ -83,7 +83,7 @@ def main(cfg: DictConfig):
     print(table_val)
     print(table_global)
 
-    with open("evaluation.txt", "w") as f:
+    with open("evaluation.log", "w") as f:
         f.write("\n\n".join([str(table_train), str(table_val), str(table_global)]))
 
 
