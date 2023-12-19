@@ -30,6 +30,7 @@ def main(cfg: DictConfig):
     if cfg.find_initial_lr:
         tuner = Tuner(trainer)
         tuner.lr_find(brain_mri_model, brain_mri_datamodule)
+        trainer = instantiate(cfg.trainer)  # Need to be reinstantiated when training on GPU
 
     trainer.fit(brain_mri_model, datamodule=brain_mri_datamodule)
 
