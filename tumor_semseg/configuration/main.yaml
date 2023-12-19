@@ -6,6 +6,7 @@ defaults:
   - _self_
 
 seed: null
+checkpoint: null
 
 datamodule:
   config:

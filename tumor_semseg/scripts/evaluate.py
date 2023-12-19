@@ -65,7 +65,9 @@ def main(cfg: DictConfig):
     # Turn-off augmentations for evaluation
     cfg.datamodule.config.augment = False
 
-    brain_mri_model: BrainMRIModule = instantiate(cfg.module)
+    brain_mri_model: BrainMRIModule = (
+        instantiate(cfg.module) if cfg.checkpoint is None else BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    )
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)
 
