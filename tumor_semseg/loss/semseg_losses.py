@@ -138,15 +138,18 @@ class FocalLoss(SemSegLoss):
         return focal_loss
 
 
-class TverskyFocalLoss(SemSegLoss):
-    def __init__(self, tversky: TverskyLoss = TverskyLoss(), focal: FocalLoss = FocalLoss()):
+class ComposedLoss(SemSegLoss):
+    def __init__(self, losses: list[SemSegLoss], weight: Optional[Tensor] = None):
         super().__init__()
-        self.tversky = tversky
-        self.focal = focal
+        self.losses = losses
+        self.weight = weight
 
     def _forward(self, inputs: Tensor, targets: Tensor):
-        tvsersky_loss = self.tversky(inputs, targets)["total"]
-        focal_loss = self.focal(inputs, targets)["total"]
-        total_loss = tvsersky_loss + focal_loss
+        loss = {}
+        loss["total"] = 0.0
+        for i, compute_loss in enumerate(self.losses):
+            loss_name = compute_loss.__class__.__name__.lower()
+            loss[loss_name] = compute_loss(inputs, targets)["total"]
+            loss["total"] += loss[loss_name] if self.weight is None else self.weight[i] * loss[loss_name]
 
-        return {"tversky": tvsersky_loss, "focal": focal_loss, "total": total_loss}
+        return loss
