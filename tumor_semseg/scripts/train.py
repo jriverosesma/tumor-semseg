@@ -13,7 +13,7 @@ from tumor_semseg.data.brain_mri_datamodule import BrainMRIDataModule
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 
-@hydra.main(config_path="../configuration", config_name="main_train", version_base="1.3")
+@hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
     if cfg.seed:
         seed_everything(cfg.seed)
