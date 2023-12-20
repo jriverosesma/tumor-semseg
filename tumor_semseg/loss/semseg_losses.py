@@ -102,10 +102,10 @@ class CELoss(SemSegLoss):
     def _forward(self, inputs: Tensor, targets: Tensor):
         if inputs.size(1) == 1:  # Number of classes
             return F.binary_cross_entropy_with_logits(
-                inputs, targets.unsqueeze(1), self.weight, reduction=self.reduction
+                inputs, targets.unsqueeze(1), pos_weight=self.weight, reduction=self.reduction
             )
         else:
-            return F.cross_entropy(inputs, targets.long(), self.weight, reduction=self.reduction)
+            return F.cross_entropy(inputs, targets.long(), weight=self.weight, reduction=self.reduction)
 
 
 class FocalLoss(SemSegLoss):
