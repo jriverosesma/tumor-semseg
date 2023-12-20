@@ -8,7 +8,7 @@ from typing import Any, Type
 
 # Third-Party
 import torch
-from torch.optim import Adamax, Optimizer
+from torch.optim import SGD, Adam, Adamax, Optimizer, RMSprop
 
 
 class CustomOptimizer:
@@ -20,5 +20,7 @@ class CustomOptimizer:
         return self.optimizer_class(model.parameters(), **self.args)
 
 
-adam: CustomOptimizer = partial(CustomOptimizer, Adamax, {"lr": 1e-3, "weight_decay": 1e-4})
+adam: CustomOptimizer = partial(CustomOptimizer, Adam, {"lr": 1e-3, "weight_decay": 1e-4})
 adamax: CustomOptimizer = partial(CustomOptimizer, Adamax, {"lr": 1e-3, "weight_decay": 1e-4})
+sgd: CustomOptimizer = partial(CustomOptimizer, SGD, {"lr": 1e-3, "weight_decay": 1e-4})
+rmsprop: CustomOptimizer = partial(CustomOptimizer, RMSprop, {"lr": 1e-3, "weight_decay": 1e-4})
