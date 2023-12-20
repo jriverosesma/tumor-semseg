@@ -59,15 +59,16 @@ def compute_global_metrics(metrics_train, metrics_val):
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
+    assert cfg.checkpoint is not None, "checkpoint must be specified in config for evaluation to run"
+
     if cfg.seed:
         seed_everything(cfg.seed)
 
     # Turn-off augmentations for evaluation
     cfg.datamodule.config.augment = False
 
-    brain_mri_model: BrainMRIModule = (
-        instantiate(cfg.module) if cfg.checkpoint is None else BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
-    )
+    brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)
 
