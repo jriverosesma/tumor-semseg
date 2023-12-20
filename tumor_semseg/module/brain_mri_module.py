@@ -9,7 +9,7 @@ from typing import Optional
 # Third-Party
 import lightning as L
 import torch
-from torch import Tensor
+from torch import Tensor, nn
 
 # TumorSemSeg
 from tumor_semseg.loss.semseg_losses import SemSegLoss
@@ -19,7 +19,7 @@ from tumor_semseg.optimize.scheduler import CustomScheduler
 
 @dataclass
 class BrainMRIModuleConfig:
-    model: L.LightningModule
+    model: nn.Module
     loss: SemSegLoss
     optimizer: CustomOptimizer
     scheduler: Optional[CustomScheduler] = None
@@ -35,6 +35,7 @@ class BrainMRIModuleConfig:
 class BrainMRIModule(L.LightningModule):
     def __init__(self, config: BrainMRIModuleConfig):
         super().__init__()
+        self.save_hyperparameters()
         self.model = config.model
         self.loss_fn = config.loss
         self.optimizer = config.optimizer
