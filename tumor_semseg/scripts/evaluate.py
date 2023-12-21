@@ -28,8 +28,8 @@ def get_metrics_table_summary(metrics: dict[str, Tensor], dataset_id: str):
 
     table: PrettyTable = PrettyTable(title=f"Evaluation Summary ({dataset_id})", header=False)
     table.add_row(["Number of samples", metrics["dice"].size(0)])
-    table.add_row(["Mean class Dice", metrics["mean_class_dice"].tolist()])
-    table.add_row(["Mean class IoU", metrics["mean_class_iou"].tolist()])
+    table.add_row(["Mean per class Dice", metrics["mean_per_class_dice"].tolist()])
+    table.add_row(["Mean per class IoU", metrics["mean_per_class_iou"].tolist()])
     table.add_row(["Mean Dice", float(metrics["mean_dice"])])
     table.add_row(["Mean IoU", float(metrics["mean_iou"])])
 
