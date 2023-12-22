@@ -17,7 +17,8 @@ trainer:
     - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
       monitor: val_total_loss
       mode: min
-      min_delta: 1e-4
+      patience: 20
+      min_delta: 1e-3
     - _target_: lightning.pytorch.callbacks.ModelCheckpoint
       filename: "{epoch}-{val_mIoU:.2f}"
       monitor: val_mIoU
