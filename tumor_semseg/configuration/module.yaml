@@ -7,16 +7,11 @@ module:
     _target_: tumor_semseg.module.brain_mri_module.BrainMRIModuleConfig
     model: ${model}
     loss:
-      _target_: tumor_semseg.loss.semseg_losses.TverskyLoss
+      _target_: tumor_semseg.loss.semseg_losses.CELoss
     optimizer:
-      _target_: tumor_semseg.optimize.optimizer.adamax
+      _target_: tumor_semseg.optimize.optimizer.adam
     scheduler:
       _target_: tumor_semseg.optimize.scheduler.reduce_lr_on_plateau
     bin_det_threshold: 0.5
     example_input_array_shape:
-      [
-        1,
-        "${in_channels}",
-        "${image_size.0}",
-        "${image_size.1}",
-      ]
+      [1, "${in_channels}", "${image_size.0}", "${image_size.1}"]
