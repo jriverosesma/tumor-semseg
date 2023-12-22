@@ -19,12 +19,12 @@ from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 def get_metrics_table_summary(metrics: dict[str, Tensor], dataset_id: str):
     # Reduce over batches
-    metrics["mean_class_dice"] = metrics["dice"].mean(0)
-    metrics["mean_class_iou"] = metrics["iou"].mean(0)
+    metrics["mean_per_class_dice"] = metrics["dice"].mean(0)
+    metrics["mean_per_class_iou"] = metrics["iou"].mean(0)
 
     # Reduce over classes
-    metrics["mean_dice"] = metrics["mean_class_dice"].mean()
-    metrics["mean_iou"] = metrics["mean_class_iou"].mean()
+    metrics["mean_dice"] = metrics["mean_per_class_dice"].mean()
+    metrics["mean_iou"] = metrics["mean_per_class_iou"].mean()
 
     table: PrettyTable = PrettyTable(title=f"Evaluation Summary ({dataset_id})", header=False)
     table.add_row(["Number of samples", metrics["dice"].size(0)])
