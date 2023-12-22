@@ -11,7 +11,7 @@ module:
     optimizer:
       _target_: tumor_semseg.optimize.optimizer.adam
     scheduler:
-      _target_: tumor_semseg.optimize.scheduler.reduce_lr_on_plateau
+      _target_: tumor_semseg.optimize.scheduler.lambda_lr
     bin_det_threshold: 0.5
     example_input_array_shape:
       [1, "${in_channels}", "${image_size.0}", "${image_size.1}"]

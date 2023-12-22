@@ -9,15 +9,12 @@ tumor_semseg_version:
   _target_: tumor_semseg.__version__
 seed: null
 checkpoint: null
+dataset_dirpath: "data/kaggle_3m"
 find_initial_lr: true
 n_classes: 1
 in_channels: 3
 image_size: [256, 256]
-
-datamodule:
-  config:
-    dataset_dirpath:
-      _args_: ["data/kaggle_3m"]
+batch_size: 32
 
 trainer:
   logger:

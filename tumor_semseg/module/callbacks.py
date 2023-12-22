@@ -12,7 +12,7 @@ from tumor_semseg.loss.utils import compute_iou
 
 
 class PredVisualizationCallback(L.Callback):
-    def __init__(self, log_every_n_batches: int, n_samples: int = 5):
+    def __init__(self, log_every_n_batches: int = 2, n_samples: int = 5):
         super().__init__()
         self.log_every_n_batches = log_every_n_batches
         self.n_samples = n_samples

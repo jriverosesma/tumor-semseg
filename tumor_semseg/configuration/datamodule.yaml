@@ -4,10 +4,10 @@ datamodule:
     _target_: tumor_semseg.data.brain_mri_datamodule.BrainMRIDataModuleConfig
     dataset_dirpath:
       _target_: pathlib.Path
-      _args_: ["data/kaggle_3m"]
+      _args_: ["${dataset_dirpath}"]
     seed: ${seed}
     test_size: 0.2
-    batch_size: 32
+    batch_size: ${batch_size}
     augment: true
     num_workers: 6
     in_channels: ${in_channels}

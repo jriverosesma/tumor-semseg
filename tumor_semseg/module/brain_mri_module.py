@@ -29,7 +29,7 @@ class BrainMRIModuleConfig:
     example_input_array_shape: Optional[tuple[int, int, int, int]] = None
 
     def __post_init__(self):
-        # NOTE: OmegaConfg does not currently support `tuple`
+        # NOTE: OmegaConf does not currently support `tuple`
         if self.example_input_array_shape:
             self.example_input_array_shape = tuple(self.example_input_array_shape)
 

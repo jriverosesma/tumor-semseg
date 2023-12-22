@@ -6,7 +6,7 @@ Evaluate model performance.
 import hydra
 import torch
 from hydra.utils import instantiate
-from lightning.pytorch import Trainer, seed_everything
+from lightning.pytorch import Trainer
 from omegaconf import DictConfig
 from prettytable import PrettyTable
 from torch import Tensor
@@ -60,9 +60,6 @@ def compute_global_metrics(metrics_train, metrics_val):
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
     assert cfg.checkpoint is not None, "checkpoint must be specified in config for evaluation to run"
-
-    if cfg.seed:
-        seed_everything(cfg.seed)
 
     # Turn-off augmentations for evaluation
     cfg.datamodule.config.augment = False

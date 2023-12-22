@@ -112,7 +112,7 @@ class BrainMRIDataModule(L.LightningDataModule):
                 case 1:
                     grayscale = True
                 case _:
-                    raise KeyError("in_channels must be one 3 (RGB) or 1 ', 'sum', 'none']")
+                    raise KeyError("in_channels must be one 3 (RGB) or 1 (L)")
 
             self.train = BrainMRIDataset(
                 "train",
