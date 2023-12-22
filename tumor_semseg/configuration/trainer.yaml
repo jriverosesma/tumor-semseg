@@ -19,6 +19,7 @@ trainer:
       mode: min
       patience: 20
       min_delta: 1e-3
+      verbose: true
     - _target_: lightning.pytorch.callbacks.ModelCheckpoint
       filename: "{epoch}-{val_mIoU:.2f}"
       monitor: val_mIoU
