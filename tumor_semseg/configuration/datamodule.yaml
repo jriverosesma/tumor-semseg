@@ -10,4 +10,5 @@ datamodule:
     batch_size: 32
     augment: true
     num_workers: 6
-    image_size: [256, 256]
+    in_channels: ${in_channels}
+    image_size: ${image_size}

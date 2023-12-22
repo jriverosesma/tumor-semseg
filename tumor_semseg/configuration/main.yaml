@@ -8,6 +8,9 @@ defaults:
 seed: null
 checkpoint: null
 find_initial_lr: true
+n_classes: 1
+in_channels: 3
+image_size: [256, 256]
 
 datamodule:
   config:

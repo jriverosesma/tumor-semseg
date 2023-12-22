@@ -16,7 +16,7 @@ module:
     example_input_array_shape:
       [
         1,
-        "${model.config.in_channels}",
-        "${datamodule.config.image_size.0}",
-        "${datamodule.config.image_size.1}",
+        "${in_channels}",
+        "${image_size.0}",
+        "${image_size.1}",
       ]
