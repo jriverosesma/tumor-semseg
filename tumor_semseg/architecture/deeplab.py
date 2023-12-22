@@ -39,7 +39,38 @@ class DeepLabv3(nn.Module):
         self.model = model_version.value[0](weights=model_version.value[1] if config.pretrained else None)
         if config.pretrained:
             self.model.aux_classifier = None
-        self.model.classifier[-1] = nn.Conv2d(256, config.n_classes, kernel_size=(1, 1), stride=(1, 1))
+
+        # Adapt in layers to input channels and number of classes
+        if config.model_version_key == "mobilenet":
+            in_conv = self.model.backbone["0"][0]
+            self.model.backbone["0"][0] = nn.Conv2d(
+                config.in_channels,
+                in_conv.out_channels,
+                kernel_size=in_conv.kernel_size,
+                stride=in_conv.stride,
+                padding=in_conv.padding,
+                bias=False,
+            )
+        else:
+            in_conv = self.model.backbone.conv1
+            self.model.backbone.conv1 = nn.Conv2d(
+                config.in_channels,
+                in_conv.out_channels,
+                kernel_size=in_conv.kernel_size,
+                stride=in_conv.stride,
+                padding=in_conv.padding,
+                bias=False,
+            )
+
+        # Adapt output layer to number of classes
+        out_conv = self.model.classifier[-1]
+        self.model.classifier[-1] = nn.Conv2d(
+            out_conv.in_channels,
+            config.n_classes,
+            kernel_size=out_conv.kernel_size,
+            stride=out_conv.stride,
+            padding=out_conv.padding,
+        )
 
     def forward(self, x):
         return self.model(x)["out"]
