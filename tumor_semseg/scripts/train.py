@@ -20,7 +20,9 @@ def main(cfg: DictConfig):
         seed_everything(cfg.seed)
 
     brain_mri_model: BrainMRIModule = (
-        instantiate(cfg.module) if cfg.checkpoint is None else BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+        BrainMRIModule(cfg.module.config)
+        if cfg.checkpoint is None
+        else BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     )
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)

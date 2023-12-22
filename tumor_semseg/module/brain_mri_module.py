@@ -9,6 +9,8 @@ from typing import Optional
 # Third-Party
 import lightning as L
 import torch
+from hydra.utils import instantiate
+from omegaconf import DictConfig
 from torch import Tensor, nn
 
 # TumorSemSeg
@@ -33,9 +35,12 @@ class BrainMRIModuleConfig:
 
 
 class BrainMRIModule(L.LightningModule):
-    def __init__(self, config: BrainMRIModuleConfig):
+    def __init__(self, config: BrainMRIModuleConfig | DictConfig):
         super().__init__()
         self.save_hyperparameters()
+        # Hyper-parameters not be saved if config is instantiated when passed as arg
+        if isinstance(config, DictConfig):
+            config: BrainMRIModuleConfig = instantiate(config)
         self.model = config.model
         self.loss_fn = config.loss
         self.optimizer = config.optimizer

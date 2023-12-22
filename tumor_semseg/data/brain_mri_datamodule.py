@@ -73,8 +73,8 @@ class BrainMRIDataset(Dataset):
         )
         mask = Image.open(self.masks[idx]).convert("L").resize(self.image_size, resample=Resampling.NEAREST)
 
-        image = np.array(image)
-        mask = np.array(mask) / 255.0
+        image = np.array(image).astype(np.float32)
+        mask = np.array(mask).astype(np.float32) / 255.0
 
         transformed = self.transform(image=image, mask=mask)
 
