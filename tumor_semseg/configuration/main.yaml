@@ -5,6 +5,8 @@ defaults:
   - hydra
   - _self_
 
+tumor_semseg_version:
+  _target_: tumor_semseg.__version__
 seed: null
 checkpoint: null
 find_initial_lr: true
