@@ -16,7 +16,7 @@ trainer:
   callbacks:
     - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
       monitor: val_mIoU
-      mode: min
+      mode: max
       patience: 30
       min_delta: 1e-3
       verbose: true
