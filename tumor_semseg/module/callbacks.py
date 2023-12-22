@@ -12,10 +12,10 @@ from tumor_semseg.loss.utils import compute_iou
 
 
 class PredVisualizationCallback(L.Callback):
-    def __init__(self, log_every_n_batches: int, num_samples: int = 1):
+    def __init__(self, log_every_n_batches: int, n_samples: int = 5):
         super().__init__()
         self.log_every_n_batches = log_every_n_batches
-        self.num_samples = num_samples
+        self.n_samples = n_samples
 
     @staticmethod
     def generate_pred_visualization(x: Tensor, y: Tensor, y_hat: Tensor, bin_det_threshold: float):
@@ -52,7 +52,7 @@ class PredVisualizationCallback(L.Callback):
     @rank_zero_only
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx % min(self.log_every_n_batches, trainer.num_training_batches) == 0:
-            for i in range(min(self.num_samples, batch[0].size(0))):
+            for i in range(min(self.n_samples, batch[0].size(0))):
                 fig = PredVisualizationCallback.generate_pred_visualization(
                     batch[0][i], batch[1][i], outputs["preds"][i], pl_module.bin_det_threshold
                 )
@@ -64,7 +64,7 @@ class PredVisualizationCallback(L.Callback):
     @rank_zero_only
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         if batch_idx % min(self.log_every_n_batches, trainer.num_val_batches[0]) == 0:
-            for i in range(min(self.num_samples, batch[0].size(0))):
+            for i in range(min(self.n_samples, batch[0].size(0))):
                 fig = PredVisualizationCallback.generate_pred_visualization(
                     batch[0][i], batch[1][i], outputs["preds"][i], pl_module.bin_det_threshold
                 )
