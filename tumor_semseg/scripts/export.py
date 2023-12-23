@@ -37,9 +37,11 @@ def main(cfg: DictConfig):
     brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     brain_mri_model.eval()
 
-    # if cfg.export.filepath is None:
-    # save_filepath = Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx")
-    save_filepath = Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx")
+    save_filepath = (
+        Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx")
+        if cfg.export.save_filepath is None
+        else cfg.export.save_filepath
+    )
 
     with torch.no_grad():
         torch_output = brain_mri_model(brain_mri_model.example_input_array)
@@ -50,12 +52,12 @@ def main(cfg: DictConfig):
         brain_mri_model.example_input_array,
         save_filepath,
         export_params=True,
-        verbose=True,
-        opset_version=13,
+        verbose=cfg.export.verbose,
+        opset_version=cfg.export.opset_version,
         training=_C._onnx.TrainingMode.EVAL,
-        do_constant_folding=True,
-        input_names=["input"],
-        output_names=["output"],
+        do_constant_folding=cfg.export.do_constant_folding,
+        input_names=cfg.export.input_names,
+        output_names=cfg.export.output_names,
     )
 
     check_onnx_model(save_filepath, torch_output, brain_mri_model.example_input_array)
@@ -63,10 +65,10 @@ def main(cfg: DictConfig):
     # Simplify ONNX model
     simplified_model, check = onnxsim.simplify(
         save_filepath,
-        check_n=10,
-        perform_optimization=True,
-        skip_fuse_bn=False,
-        skip_constant_folding=False,
+        check_n=cfg.export.check_n,
+        perform_optimization=cfg.export.perform_optimization,
+        skip_fuse_bn=cfg.export.skip_fuse_bn,
+        skip_constant_folding=not cfg.export.constant_folding,
     )
 
     assert check, "Simplified ONNX model could not be validated"

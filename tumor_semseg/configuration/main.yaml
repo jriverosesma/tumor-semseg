@@ -2,6 +2,7 @@ defaults:
   - datamodule
   - module
   - trainer
+  - export
   - hydra
   - _self_
 
