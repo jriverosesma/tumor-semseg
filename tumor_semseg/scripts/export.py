@@ -38,7 +38,7 @@ def main(cfg: DictConfig):
     brain_mri_model.eval()
 
     save_filepath = (
-        Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx")
+        str(Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx"))
         if cfg.export.save_filepath is None
         else cfg.export.save_filepath
     )
@@ -68,7 +68,7 @@ def main(cfg: DictConfig):
         check_n=cfg.export.check_n,
         perform_optimization=cfg.export.perform_optimization,
         skip_fuse_bn=cfg.export.skip_fuse_bn,
-        skip_constant_folding=not cfg.export.constant_folding,
+        skip_constant_folding=not cfg.export.do_constant_folding,
     )
 
     assert check, "Simplified ONNX model could not be validated"
