@@ -78,6 +78,7 @@ def main(cfg: DictConfig):
             raise KeyError("in_channels must be one 3 (RGB) or 1 (L)")
 
     model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    model.eval()
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=False)
 

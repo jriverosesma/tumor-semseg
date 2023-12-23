@@ -65,6 +65,7 @@ def main(cfg: DictConfig):
     cfg.datamodule.config.augment = False
 
     brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    brain_mri_model.eval()
 
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
     trainer: Trainer = instantiate(cfg.trainer)
@@ -72,8 +73,9 @@ def main(cfg: DictConfig):
     trainer.logger.log_hyperparams(cfg)
 
     brain_mri_datamodule.setup("fit")
-    output_train = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.train_dataloader())
-    output_val = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.val_dataloader())
+    with torch.no_grad():
+        output_train = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.train_dataloader())
+        output_val = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.val_dataloader())
 
     metrics_train, table_train = compute_metrics_from_output(output_train, "train")
     metrics_val, table_val = compute_metrics_from_output(output_val, "val")

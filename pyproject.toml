@@ -43,6 +43,7 @@ build-backend = "poetry.core.masonry.api"
 semseg_train = "tumor_semseg.scripts.train:main"
 semseg_eval = "tumor_semseg.scripts.evaluate:main"
 semseg_infer = "tumor_semseg.scripts.inference:main"
+semseg_export = "tumor_semseg.scripts.export:main"
 
 [tool.black]
 line-length = 120
