@@ -27,7 +27,7 @@ class CustomScheduler:
 reduce_lr_on_plateau: CustomScheduler = partial(
     CustomScheduler,
     ReduceLROnPlateau,
-    {"mode": "max", "factor": 0.8, "patience": 2, "threshold": 5e-4},
+    {"mode": "max", "factor": 0.2, "patience": 2, "threshold": 5e-4},
     {"monitor": "val_mIoU"},
 )
 lambda_lr: CustomScheduler = partial(CustomScheduler, LambdaLR, {"lr_lambda": lambda epoch: 0.85**epoch})
