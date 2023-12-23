@@ -1,6 +1,6 @@
 # Check all available models in: https://github.com/qubvel/segmentation_models.pytorch
 model:
-  _target_: segmentation_models_pytorch.UnetPlusPlus
+  _target_: segmentation_models_pytorch.decoders.unetplusplus.UnetPlusPlus
   encoder: resnext50_32x4d
   encoder_weights: imagenet
   in_channels: ${in_channels}
