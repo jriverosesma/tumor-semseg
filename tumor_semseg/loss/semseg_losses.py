@@ -122,15 +122,20 @@ class FocalLoss(SemSegLoss):
         n_batches = inputs.size(0)
         n_classes = inputs.size(1)
 
-        log_pt = F.logsigmoid(inputs) if n_classes == 1 else F.log_softmax(inputs, dim=1)
-        pt = torch.exp(log_pt)
+        if n_classes == 1:
+            log_pt = F.logsigmoid(inputs)
+            pt = torch.sigmoid(inputs)
+        else:
+            log_pt = F.log_softmax(inputs, dim=1)
+            pt = F.softmax(inputs, dim=1)
+
         focal_term = (1 - pt) ** self.gamma
-        focal_loss = -self.alpha * focal_term * log_pt
 
-        focal_loss = focal_loss.view(n_batches, n_classes, -1)
-        targets_one_hot = one_hot_encode(targets, n_classes).view(n_batches, n_classes, -1)
-
-        focal_loss = focal_loss * targets_one_hot
+        if n_classes == 1:
+            focal_loss = -self.alpha * focal_term * (targets * log_pt + (1 - targets) * torch.log(1 - pt))
+        else:
+            targets_one_hot = one_hot_encode(targets, n_classes).view(n_batches, n_classes, -1)
+            focal_loss = -self.alpha * focal_term * (targets_one_hot * log_pt)
 
         focal_loss = reduce(focal_loss, dims=[-1], reduction=self.class_reduction)
         focal_loss = reduce(focal_loss, reduction=self.batch_reduction)
