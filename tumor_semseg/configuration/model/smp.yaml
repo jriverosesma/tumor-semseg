@@ -1,9 +1,8 @@
 # Check all available models in: https://github.com/qubvel/segmentation_models.pytorch
-model:
-  _target_: segmentation_models_pytorch.decoders.unetplusplus.model.UnetPlusPlus
-  encoder_name: resnext50_32x4d
-  encoder_weights: imagenet
-  decoder_use_batchnorm: true
-  in_channels: ${in_channels}
-  classes: ${n_classes}
-  activation: sigmoid
+_target_: segmentation_models_pytorch.decoders.unetplusplus.model.UnetPlusPlus
+encoder_name: resnext50_32x4d
+encoder_weights: imagenet
+decoder_use_batchnorm: true
+in_channels: ${in_channels}
+classes: ${n_classes}
+activation: null
