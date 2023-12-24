@@ -1,5 +1,5 @@
 defaults:
-  - model: deeplab
+  - model: smp
 
 module:
   _target_: tumor_semseg.module.brain_mri_module.BrainMRIModule
