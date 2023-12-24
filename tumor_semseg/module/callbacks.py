@@ -19,7 +19,7 @@ class PredVisualizationCallback(L.Callback):
 
     @staticmethod
     def generate_pred_visualization(x: Tensor, y: Tensor, y_hat: Tensor, bin_det_threshold: float):
-        y_hat = y_hat.sigmoid().detach()
+        y_hat = y_hat.detach().sigmoid()
         y_hat_t = torch.where(y_hat > bin_det_threshold, 1.0, 0.0)
         iou = float(compute_iou(y_hat_t.unsqueeze(0), y))
 
@@ -51,7 +51,6 @@ class PredVisualizationCallback(L.Callback):
 
     @rank_zero_only
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-        pl_module.eval()
         if batch_idx % min(self.log_every_n_batches, trainer.num_training_batches) == 0:
             with torch.no_grad():
                 for i in range(min(self.n_samples, batch[0].size(0))):
@@ -65,7 +64,6 @@ class PredVisualizationCallback(L.Callback):
 
     @rank_zero_only
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-        pl_module.eval()
         if batch_idx % min(self.log_every_n_batches, trainer.num_val_batches[0]) == 0:
             with torch.no_grad():
                 for i in range(min(self.n_samples, batch[0].size(0))):
@@ -85,13 +83,13 @@ class ComputeIoUCallback(L.Callback):
             _, y = batch
             y_hat = torch.where(outputs["preds"].sigmoid() > pl_module.bin_det_threshold, 1.0, 0.0)
             iou = compute_iou(y_hat, y).mean(0)  # Average over batches
+        pl_module.train()
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"train_IoU_class_{class_idx}", class_iou, sync_dist=True)
         pl_module.log("train_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True, on_step=False)
 
     def on_validation_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-        pl_module.eval()
         with torch.no_grad():
             _, y = batch
             y_hat = torch.where(outputs["preds"].sigmoid() > pl_module.bin_det_threshold, 1.0, 0.0)
