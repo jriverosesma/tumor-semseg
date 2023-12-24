@@ -126,8 +126,8 @@ class FocalLoss(SemSegLoss):
             log_pt = F.logsigmoid(inputs)
             pt = torch.sigmoid(inputs)
         else:
-            log_pt = F.log_softmax(inputs, dim=1)
-            pt = F.softmax(inputs, dim=1)
+            log_pt = F.log_softmax(inputs, dim=1).view(n_batches, n_classes, -1)
+            pt = F.softmax(inputs, dim=1).view(n_batches, n_classes, -1)
 
         focal_term = (1 - pt) ** self.gamma
 
