@@ -76,10 +76,9 @@ class PredVisualizationCallback(L.Callback):
 
 class ComputeIoUCallback(L.Callback):
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
-        with torch.no_grad():
-            _, y = batch
-            y_hat = torch.where(outputs["preds"].sigmoid() > pl_module.bin_det_threshold, 1.0, 0.0)
-            iou = compute_iou(y_hat, y).mean(0)  # Average over batches
+        _, y = batch
+        y_hat = torch.where(outputs["preds"].sigmoid() > pl_module.bin_det_threshold, 1.0, 0.0)
+        iou = compute_iou(y_hat, y).mean(0)  # Average over batches
 
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"train_IoU_class_{class_idx}", class_iou, sync_dist=True)
