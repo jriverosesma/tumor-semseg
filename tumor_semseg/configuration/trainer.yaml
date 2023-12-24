@@ -31,5 +31,5 @@ trainer:
       max_depth: -1
     - _target_: tumor_semseg.module.callbacks.ComputeIoUCallback
     - _target_: tumor_semseg.module.callbacks.PredVisualizationCallback
-      log_every_n_batches: 2
+      log_every_n_batches: 5
       n_samples: 5
