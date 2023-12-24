@@ -11,7 +11,7 @@ tumor_semseg_version:
 seed: null
 checkpoint: null
 dataset_dirpath: "data/kaggle_3m"
-find_initial_lr: true
+find_initial_lr: false
 n_classes: 1
 in_channels: 3
 image_size: [256, 256]
