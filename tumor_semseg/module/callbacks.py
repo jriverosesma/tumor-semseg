@@ -4,7 +4,9 @@ import lightning as L
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from lightning.pytorch.callbacks import ModelPruning
 from lightning.pytorch.utilities import rank_zero_only
+from omegaconf.dictconfig import DictConfig
 from torch import Tensor
 
 # TumorSemSeg
@@ -92,3 +94,17 @@ class ComputeIoUCallback(L.Callback):
         for class_idx, class_iou in enumerate(iou):
             pl_module.log(f"val_IoU_class_{class_idx}", class_iou, sync_dist=True)
         pl_module.log("val_mIoU", iou.mean(), sync_dist=True, prog_bar=True, on_epoch=True, on_step=False)
+
+
+class CustomModelPruning(ModelPruning):
+    def __init__(self, **params: DictConfig):
+        super().__init__(**params)
+
+    def filter_parameters_to_prune(
+        self, parameters_to_prune: list[tuple[torch.nn.Module, str]]
+    ) -> list[tuple[torch.nn.Module, str]]:
+        return [
+            (module, param_name)
+            for module, param_name in parameters_to_prune
+            if isinstance(module, (torch.nn.Conv2d, torch.nn.Linear))
+        ]
