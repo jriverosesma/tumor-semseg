@@ -55,8 +55,6 @@ class BrainMRIInferenceDataset(Dataset):
             .resize(self.image_size, resample=Resampling.BILINEAR)
         )
         image = np.array(image)
-        if self.grayscale:
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         input_image = self.transform(image=image.astype(np.float32))["image"]
 
         return input_image.float(), image, self.images[idx]
@@ -93,6 +91,7 @@ def main(cfg: DictConfig):
             ):
                 filepath = str(output_path / f"{Path(image_path).stem}_{i}.jpeg")
                 contours, _ = cv2.findContours(pred, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+                image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR) if grayscale else cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
                 cv2.drawContours(image, contours, -1, (0, 0, 255), 2)
                 cv2.imwrite(filepath, image)
 

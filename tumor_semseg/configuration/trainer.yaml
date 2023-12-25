@@ -18,7 +18,7 @@ trainer:
     - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
       monitor: val_total_loss
       mode: min
-      patience: 5
+      patience: 10
       min_delta: 1e-4
       verbose: true
     - _target_: lightning.pytorch.callbacks.ModelCheckpoint
@@ -27,6 +27,17 @@ trainer:
       mode: max
       save_last: true
       save_top_k: 1
+    - _target_: tumor_semseg.module.callbacks.CustomModelPruning
+      pruning_fn: ln_structured
+      parameter_names: [weight]
+      pruning_dim: 0
+      pruning_norm: 1
+      amount: 0.005
+      use_global_unstructured: false
+      apply_pruning: true
+      make_pruning_permanent: true
+      prune_on_train_epoch_end: true
+      verbose: 1
     - _target_: lightning.pytorch.callbacks.model_summary.ModelSummary
       max_depth: -1
     - _target_: tumor_semseg.module.callbacks.ComputeIoUCallback
