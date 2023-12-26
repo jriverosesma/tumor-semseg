@@ -20,3 +20,8 @@ batch_size: 32
 trainer:
   logger:
     experiment: tumorsemseg_v0
+
+quantization: # noqa
+  qat: true
+  qconfig: x86
+  fuse_modules: true

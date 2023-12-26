@@ -15,3 +15,4 @@ module:
     bin_det_threshold: 0.5
     example_input_array_shape:
       [1, "${in_channels}", "${image_size.0}", "${image_size.1}"]
+    qat: ${quantization.qat}

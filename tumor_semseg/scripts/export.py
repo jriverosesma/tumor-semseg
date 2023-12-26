@@ -1,5 +1,5 @@
 """
-This files defines the entry point for training.
+This files defines the entry point for exporting models to ONNX format.
 """
 
 # Standard

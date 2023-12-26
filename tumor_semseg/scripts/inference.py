@@ -1,5 +1,5 @@
 """
-Run inference on given images.
+Entry point to run inferences on given images.
 """
 
 # Standard

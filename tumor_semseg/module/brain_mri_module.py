@@ -27,6 +27,7 @@ class BrainMRIModuleConfig:
     scheduler: Optional[CustomScheduler] = None
     bin_det_threshold: float = 0.5
     example_input_array_shape: Optional[tuple[int, int, int, int]] = None
+    qat: bool = False
 
     def __post_init__(self):
         # NOTE: OmegaConf does not currently support `tuple`
@@ -37,20 +38,31 @@ class BrainMRIModuleConfig:
 class BrainMRIModule(L.LightningModule):
     def __init__(self, config: BrainMRIModuleConfig | DictConfig):
         super().__init__()
+        # NOTE: Hyper-parameters not saved if config is instantiated when passed as arg
         self.save_hyperparameters()
-        # Hyper-parameters not be saved if config is instantiated when passed as arg
+
         if isinstance(config, DictConfig):
             config: BrainMRIModuleConfig = instantiate(config)
+
         self.model = config.model
         self.loss_fn = config.loss
         self.optimizer = config.optimizer
         self.scheduler = config.scheduler
         self.bin_det_threshold = config.bin_det_threshold
+        self.lr = None  # Special Lightning attribute used for initial LR tuning only
+
         if config.example_input_array_shape:
             self.example_input_array = torch.zeros(
                 config.example_input_array_shape
             )  # Special Lightning attribute to compute I/O size of each layer for model summary
-        self.lr = None  # For initial LR tuning only
+
+        if config.qat:
+            self.quant = torch.ao.quantization.QuantStub()
+            self.dequant = torch.ao.quantization.DeQuantStub()
+            self.forward = self.forward_quantize
+
+    def forward_quantize(self, inputs):
+        return self.dequant(self.model(self.quant(inputs)))
 
     def forward(self, inputs):
         return self.model(inputs)
