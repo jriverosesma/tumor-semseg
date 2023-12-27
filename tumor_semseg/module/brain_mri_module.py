@@ -15,8 +15,15 @@ from torch import Tensor, nn
 
 # TumorSemSeg
 from tumor_semseg.loss.semseg_losses import SemSegLoss
+from tumor_semseg.module.quantization import auto_fuse_modules
 from tumor_semseg.optimize.optimizer import CustomOptimizer
 from tumor_semseg.optimize.scheduler import CustomScheduler
+
+
+@dataclass
+class QuantizationConfig:
+    qconfig: str = "x86"
+    fuse_modules: bool = True
 
 
 @dataclass
@@ -27,7 +34,7 @@ class BrainMRIModuleConfig:
     scheduler: Optional[CustomScheduler] = None
     bin_det_threshold: float = 0.5
     example_input_array_shape: Optional[tuple[int, int, int, int]] = None
-    qat: bool = False
+    qat: Optional[QuantizationConfig] = None
 
     def __post_init__(self):
         # NOTE: OmegaConf does not currently support `tuple`
@@ -60,6 +67,12 @@ class BrainMRIModule(L.LightningModule):
             self.quant = torch.ao.quantization.QuantStub()
             self.dequant = torch.ao.quantization.DeQuantStub()
             self.forward = self.forward_quantize
+
+            self.model.eval()
+            self.model.qconfig = torch.ao.quantization.get_default_qat_qconfig(config.qat.qconfig)
+            if config.qat.fuse_modules:
+                auto_fuse_modules(self.model)
+            self.model = torch.ao.quantization.prepare_qat(self.model.train())
 
     def forward_quantize(self, inputs):
         return self.dequant(self.model(self.quant(inputs)))

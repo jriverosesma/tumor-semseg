@@ -97,9 +97,6 @@ class ComputeIoUCallback(L.Callback):
 
 
 class CustomModelPruning(ModelPruning):
-    def __init__(self, **params: DictConfig):
-        super().__init__(**params)
-
     def filter_parameters_to_prune(
         self, parameters_to_prune: list[tuple[torch.nn.Module, str]]
     ) -> list[tuple[torch.nn.Module, str]]:

@@ -10,7 +10,7 @@ tumor_semseg_version:
   _target_: tumor_semseg.__version__
 seed: null
 checkpoint: null
-dataset_dirpath: "data/kaggle_3m"
+dataset_dirpath: data/kaggle_3m
 find_initial_lr: false
 n_classes: 1
 in_channels: 3
@@ -19,9 +19,4 @@ batch_size: 32
 
 trainer:
   logger:
-    experiment: tumorsemseg_v0
-
-quantization: # noqa
-  qat: true
-  qconfig: x86
-  fuse_modules: true
+    experiment: tumorsemseg
