@@ -20,7 +20,7 @@ from torch import _C, Tensor
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 
-def check_onnx_model(onnx_model_path: Path, expected_output: Tensor, input_tensor: Tensor) -> None:
+def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor: Tensor) -> None:
     # Model check
     onnx.checker.check_model(onnx_model_path)
 
@@ -35,7 +35,7 @@ def check_onnx_model(onnx_model_path: Path, expected_output: Tensor, input_tenso
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
-    brain_mri_model: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    brain_mri_model: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint, map_location=torch.device("cpu"))
     model = brain_mri_model.model
     model.eval()
     if hasattr(brain_mri_model, "qconfig"):
