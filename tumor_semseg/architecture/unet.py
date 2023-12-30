@@ -4,7 +4,9 @@ Mainly based on UNet implementation of: https://github.com/milesial/Pytorch-UNet
 """
 
 # Standard
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from functools import partial
+from typing import Any, Callable
 
 # Third-Party
 import torch.nn as nn
@@ -17,8 +19,12 @@ from tumor_semseg.architecture.unet_blocks import DoubleConv, Down, Head, Up
 class UNetConfig:
     n_classes: int
     in_channels: int = 3
-    activation: nn.Module = nn.ReLU(inplace=True)
+    activation_name: str = "ReLU"
+    activation_params: dict[str, Any] = field(default_factory=lambda: {"inplace": True})
     bilinear: bool = False
+
+    def __post_init__(self):
+        self.activation: Callable = partial(getattr(nn, self.activation_name)(**self.activation_params))
 
 
 class UNet(nn.Module):

@@ -18,4 +18,4 @@ module:
     qat: # noqa
       _target_: tumor_semseg.module.brain_mri_module.QuantizationConfig
       qconfig: x86
-      fuse_modules: true
+      fuse_modules: true # noqa
