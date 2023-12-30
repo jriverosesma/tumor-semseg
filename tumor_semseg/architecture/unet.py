@@ -1,6 +1,6 @@
 """
 UNet model architecture definition.
-Mainly based on UNet implementation of: https://github.com/milesial/Pytorch-UNet
+Mainly based on UNet implementation from: https://github.com/milesial/Pytorch-UNet
 """
 
 # Standard
@@ -24,7 +24,7 @@ class UNetConfig:
     bilinear: bool = False
 
     def __post_init__(self):
-        self.activation: Callable = partial(getattr(nn, self.activation_name)(**self.activation_params))
+        self.activation: Callable = partial(getattr(nn, self.activation_name), **self.activation_params)
 
 
 class UNet(nn.Module):
