@@ -11,7 +11,9 @@ import torch.nn as nn
 # Fusable patterns sorted by priority
 FUSABLE_PATTERNS = [
     (nn.Conv2d, nn.BatchNorm2d, nn.ReLU),
+    (nn.Conv2d, nn.BatchNorm2d),
     (nn.Conv2d, nn.ReLU),
+    (nn.Linear, nn.BatchNorm2d, nn.ReLU),
     (nn.Linear, nn.BatchNorm2d),
     (nn.Linear, nn.ReLU),
 ]
