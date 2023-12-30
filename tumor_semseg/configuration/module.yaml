@@ -15,7 +15,7 @@ module:
     bin_det_threshold: 0.5
     example_input_array_shape:
       [1, "${in_channels}", "${image_size.0}", "${image_size.1}"]
-    qat: null # noqa (experimental feature)
-    #   _target_: tumor_semseg.module.brain_mri_module.QuantizationConfig
-    #   qconfig: x86
-    #   fuse_modules: true # noqa
+    qat: null # experimental feature
+      # _target_: tumor_semseg.module.brain_mri_module.QuantizationConfig
+      # qconfig: x86
+      # auto_fuse_modules: true

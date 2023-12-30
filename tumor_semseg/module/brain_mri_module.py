@@ -24,7 +24,7 @@ from tumor_semseg.optimize.scheduler import CustomScheduler
 @dataclass
 class QuantizationConfig:
     qconfig: str = "x86"
-    fuse_modules: bool = True
+    auto_fuse_modules: bool = True
 
 
 @dataclass
@@ -65,8 +65,8 @@ class BrainMRIModule(L.LightningModule):
         if config.qat:
             self.model = nn.Sequential(quantization.QuantStub(), self.model, quantization.DeQuantStub())
             self.model.eval()
-            self.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
-            if config.qat.fuse_modules:
+            self.model.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
+            if config.qat.auto_fuse_modules:
                 auto_fuse_modules(self.model)
             quantization.prepare_qat(self.model.train(), inplace=True)
 
