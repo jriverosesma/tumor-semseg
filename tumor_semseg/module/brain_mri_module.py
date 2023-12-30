@@ -15,7 +15,7 @@ from omegaconf import DictConfig
 from torch import Tensor, nn
 
 # TumorSemSeg
-from tumor_semseg.architecture.utils import auto_fuse_model_layers
+from tumor_semseg.architecture.utils import auto_fuse_modules
 from tumor_semseg.loss.semseg_losses import SemSegLoss
 from tumor_semseg.optimize.optimizer import CustomOptimizer
 from tumor_semseg.optimize.scheduler import CustomScheduler
@@ -67,7 +67,7 @@ class BrainMRIModule(L.LightningModule):
             self.model.eval()
             self.model.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
             if config.qat.fuse_modules:
-                auto_fuse_model_layers(self.model)
+                auto_fuse_modules(self.model)
             quantization.prepare_qat(self.model.train(), inplace=True)
 
     def forward(self, inputs):

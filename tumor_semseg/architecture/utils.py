@@ -17,9 +17,9 @@ FUSABLE_PATTERNS = [
 ]
 
 
-def auto_fuse_model_layers(model: nn.Module) -> None:
+def auto_fuse_modules(model: nn.Module) -> None:
     """
-    Automatically fuse sets of `nn.Module` based on the available fusable patterns.
+    Automatically fuses sets of `nn.Module` based on the available fusable patterns.
 
     NOTE: This is an experimental feature.
 
