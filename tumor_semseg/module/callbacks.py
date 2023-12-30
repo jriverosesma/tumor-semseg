@@ -6,7 +6,6 @@ import numpy as np
 import torch
 from lightning.pytorch.callbacks import ModelPruning
 from lightning.pytorch.utilities import rank_zero_only
-from omegaconf.dictconfig import DictConfig
 from torch import Tensor
 
 # TumorSemSeg
