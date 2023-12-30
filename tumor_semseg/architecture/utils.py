@@ -1,5 +1,5 @@
 """
-Utilities for Neural Network quantization.
+Utilities the work with Neural Network architectures.
 """
 
 # Third-Party
