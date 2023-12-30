@@ -9,13 +9,14 @@ from typing import Optional
 # Third-Party
 import lightning as L
 import torch
+import torch.ao.quantization as quantization
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch import Tensor, nn
 
 # TumorSemSeg
 from tumor_semseg.loss.semseg_losses import SemSegLoss
-from tumor_semseg.module.quantization import auto_fuse_modules
+from tumor_semseg.module.quantization import auto_fuse_model_layers
 from tumor_semseg.optimize.optimizer import CustomOptimizer
 from tumor_semseg.optimize.scheduler import CustomScheduler
 
@@ -56,26 +57,18 @@ class BrainMRIModule(L.LightningModule):
         self.optimizer = config.optimizer
         self.scheduler = config.scheduler
         self.bin_det_threshold = config.bin_det_threshold
+        self.example_input_array = torch.zeros(
+            config.example_input_array_shape
+        )  # Special Lightning attribute to compute I/O size of each layer for model summary
         self.lr = None  # Special Lightning attribute used for initial LR tuning only
 
-        if config.example_input_array_shape:
-            self.example_input_array = torch.zeros(
-                config.example_input_array_shape
-            )  # Special Lightning attribute to compute I/O size of each layer for model summary
-
         if config.qat:
-            self.quant = torch.ao.quantization.QuantStub()
-            self.dequant = torch.ao.quantization.DeQuantStub()
-            self.forward = self.forward_quantize
-
+            self.model = nn.Sequential(quantization.QuantStub(), self.model, quantization.DeQuantStub())
             self.model.eval()
-            self.model.qconfig = torch.ao.quantization.get_default_qat_qconfig(config.qat.qconfig)
+            self.model.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
             if config.qat.fuse_modules:
-                auto_fuse_modules(self.model)
-            self.model = torch.ao.quantization.prepare_qat(self.model.train())
-
-    def forward_quantize(self, inputs):
-        return self.dequant(self.model(self.quant(inputs)))
+                auto_fuse_model_layers(self.model)
+            quantization.prepare_qat(self.model.train(), inplace=True)
 
     def forward(self, inputs):
         return self.model(inputs)
@@ -110,7 +103,7 @@ class BrainMRIModule(L.LightningModule):
         # For initial LR tuning
         if self.lr is not None:
             self.optimizer.args["lr"] = self.lr
-        config = {"optimizer": self.optimizer.get_optimizer(self.model)}
+        config = {"optimizer": self.optimizer.get_optimizer(self)}
         if self.scheduler:
             config["lr_scheduler"] = {"scheduler": self.scheduler.get_scheduler(config["optimizer"])}
             if self.scheduler.params:

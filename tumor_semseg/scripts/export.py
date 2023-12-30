@@ -12,6 +12,7 @@ import onnx
 import onnxruntime as ort
 import onnxsim
 import torch
+import torch.nn as nn
 from omegaconf import DictConfig
 from torch import _C, Tensor
 
@@ -34,8 +35,11 @@ def check_onnx_model(onnx_model_path: Path, expected_output: Tensor, input_tenso
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
-    brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
-    brain_mri_model.eval()
+    brain_mri_model: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    model = brain_mri_model.model
+    model.eval()
+    if hasattr(brain_mri_model, "qconfig"):
+        model = torch.ao.quantization.convert(model)
 
     save_filepath = (
         str(Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx"))
@@ -44,15 +48,14 @@ def main(cfg: DictConfig):
     )
 
     with torch.no_grad():
-        torch_output = brain_mri_model(brain_mri_model.example_input_array)
+        torch_output = model(brain_mri_model.example_input_array)
 
     # Export from torch to ONNX
     torch.onnx.export(
-        brain_mri_model,
+        model,
         brain_mri_model.example_input_array,
         save_filepath,
         export_params=True,
-        verbose=cfg.export.verbose,
         opset_version=cfg.export.opset_version,
         training=_C._onnx.TrainingMode.EVAL,
         do_constant_folding=cfg.export.do_constant_folding,

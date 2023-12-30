@@ -2,6 +2,9 @@
 This files defines the entry point for training.
 """
 
+# Standard
+import warnings
+
 # Third-Party
 import hydra
 from hydra.utils import instantiate
@@ -12,6 +15,7 @@ from omegaconf import DictConfig
 # TumorSemSeg
 from tumor_semseg.data.brain_mri_datamodule import BrainMRIDataModule
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
+from tumor_semseg.module.callbacks import CustomModelPruning
 
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
@@ -28,6 +32,15 @@ def main(cfg: DictConfig):
 
     if cfg.module.config.qat:
         cfg.trainer.precision = "32-true"  # Need to use float32 precision for QAT
+        model_pruning_class_path = f"{CustomModelPruning.__module__}.{CustomModelPruning.__name__}"
+        for i, callback in enumerate(cfg.trainer.callbacks):
+            if callback["_target_"] == model_pruning_class_path:
+                cfg.trainer.callbacks.pop(i)
+                warnings.warn(
+                    "Pruning not compatible with QAT (checkpoint loading will not work). Turning off pruning.",
+                    UserWarning,
+                )
+                break
 
     trainer: Trainer = instantiate(cfg.trainer)
 

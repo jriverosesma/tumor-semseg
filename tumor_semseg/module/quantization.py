@@ -3,9 +3,12 @@ Utilities for Neural Network quantization.
 """
 
 # Third-Party
-import torch
+import torch.ao.quantization as quantization
+
+# Third-party
 import torch.nn as nn
 
+# Fusable patterns sorted by priority
 FUSABLE_PATTERNS = [
     (nn.Conv2d, nn.BatchNorm2d, nn.ReLU),
     (nn.Conv2d, nn.ReLU),
@@ -14,34 +17,45 @@ FUSABLE_PATTERNS = [
 ]
 
 
-def get_fusable_layers(model: nn.Module):
-    layers_to_fuse = []
-    i = 0
-    while i < len(model) - 1:
-        name, layer = model[i]
-        next_name, next_layer = model[i + 1]
+def auto_fuse_model_layers(model: nn.Module) -> None:
+    """
+    Automatically fuse sets of `nn.Module` based on the available fusable patterns.
 
+    NOTE: This is an experimental feature.
+
+    Args:
+        model: Module to fuse.
+    """
+
+    named_modules: list[tuple[str, nn.Module]] = list(model.named_modules())
+    modules_to_fuse: list[list[str]] = []
+    modules_to_fuse_idx: list[int] = []
+    for i in range(len(named_modules)):
+        if i in modules_to_fuse_idx:
+            continue
+        if named_modules[i][0] == "model.1.down_conv_1.down_conv":
+            pass
         for pattern in FUSABLE_PATTERNS:
-            if isinstance(layer, pattern[0]) and isinstance(next_layer, pattern[1]):
-                fuse_layers = [name, next_name]
+            try:
+                parent: str = ""
+                matching_modules: list[str] = []
+                matching_modules_idx: list[int] = []
+                for j, pattern_module in enumerate(pattern):
+                    if isinstance(named_modules[i + j][1], pattern_module):
+                        current_module_parent = named_modules[i + j][0].rsplit(".", 1)[0]
+                        if not parent:
+                            parent = current_module_parent
+                        elif parent != current_module_parent:
+                            break
+                        matching_modules.append(named_modules[i + j][0])
+                        matching_modules_idx.append(i + j)
+                    else:
+                        break
+                if matching_modules and len(matching_modules) > 1:
+                    modules_to_fuse.append(matching_modules)
+                    modules_to_fuse_idx += matching_modules_idx
+                    break
+            except IndexError:
+                continue
 
-                # Check for optional third layer in the pattern
-                if len(pattern) == 3 and i + 2 < len(model) and isinstance(model[i + 2][1], pattern[2]):
-                    fuse_layers.append(model[i + 2][0])
-                    i += 1  # Include third layer in fusion
-
-                layers_to_fuse.append(fuse_layers)
-                i += 1  # Skip next layer as it is included in fusion
-                break  # Exit loop once a pattern is matched
-
-        i += 1
-
-    return layers_to_fuse
-
-
-def auto_fuse_modules(model: nn.Module):
-    for _, child in model.named_children():
-        child_layers_to_fuse = get_fusable_layers(list(child.named_children()))
-        if child_layers_to_fuse:
-            torch.ao.quantization.fuse_modules(child, child_layers_to_fuse)
-        auto_fuse_modules(child)
+    quantization.fuse_modules(model, modules_to_fuse, inplace=True)
