@@ -27,9 +27,12 @@ def auto_fuse_modules(model: nn.Module) -> None:
         model: Module to fuse.
     """
 
+    assert not model.training, "Model must be in eval mode for fusion to work"
+
     named_modules: list[tuple[str, nn.Module]] = list(model.named_modules())
     modules_to_fuse: list[list[str]] = []
     modules_to_fuse_idx: list[int] = []
+
     for i in range(len(named_modules)):
         if i in modules_to_fuse_idx:
             continue
@@ -40,7 +43,8 @@ def auto_fuse_modules(model: nn.Module) -> None:
                 matching_modules_idx: list[int] = []
                 for j, pattern_module in enumerate(pattern):
                     if isinstance(named_modules[i + j][1], pattern_module):
-                        current_module_parent = named_modules[i + j][0].rsplit(".", 1)[0]
+                        current_module_parent = named_modules[i + j][0].rsplit(".", 1)
+                        current_module_parent = current_module_parent[0] if len(current_module_parent) > 1 else ""
                         if not parent:
                             parent = current_module_parent
                         elif parent != current_module_parent:
@@ -56,4 +60,5 @@ def auto_fuse_modules(model: nn.Module) -> None:
             except IndexError:
                 continue
 
-    quantization.fuse_modules(model, modules_to_fuse, inplace=True)
+    if modules_to_fuse:
+        quantization.fuse_modules(model, modules_to_fuse, inplace=True)
