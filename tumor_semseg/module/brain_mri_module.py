@@ -64,11 +64,11 @@ class BrainMRIModule(L.LightningModule):
 
         if config.qat:
             self.model = nn.Sequential(quantization.QuantStub(), self.model, quantization.DeQuantStub())
-            self.eval()
+            self.model.eval()
             self.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
             if config.qat.fuse_modules:
-                auto_fuse_modules(self)
-            quantization.prepare_qat(self.train(), inplace=True)
+                auto_fuse_modules(self.model)
+            quantization.prepare_qat(self.model.train(), inplace=True)
 
     def forward(self, inputs):
         return self.model(inputs)
