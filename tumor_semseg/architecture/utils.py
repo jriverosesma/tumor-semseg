@@ -33,8 +33,6 @@ def auto_fuse_modules(model: nn.Module) -> None:
     for i in range(len(named_modules)):
         if i in modules_to_fuse_idx:
             continue
-        if named_modules[i][0] == "model.1.down_conv_1.down_conv":
-            pass
         for pattern in FUSABLE_PATTERNS:
             try:
                 parent: str = ""
