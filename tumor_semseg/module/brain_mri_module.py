@@ -57,13 +57,12 @@ class BrainMRIModule(L.LightningModule):
         self.optimizer = config.optimizer
         self.scheduler = config.scheduler
         self.bin_det_threshold = config.bin_det_threshold
-        self.example_input_array = torch.zeros(
+        self.example_input_array = torch.ones(
             config.example_input_array_shape
         )  # Special Lightning attribute to compute I/O size of each layer for model summary
         self.lr = None  # Special Lightning attribute used for initial LR tuning only
 
         if config.qat:
-            self.forward = self.forward_quantize
             self.quant = quantization.QuantStub()
             self.dequant = quantization.DeQuantStub()
             self.eval()
@@ -72,10 +71,9 @@ class BrainMRIModule(L.LightningModule):
                 auto_fuse_modules(self.model)
             quantization.prepare_qat(self.train(), inplace=True)
 
-    def forward_quantize(self, inputs):
-        return self.dequant(self.model(self.quant(inputs)))
-
     def forward(self, inputs):
+        if hasattr(self, "qconfig"):
+            return self.dequant(self.model(self.quant(inputs)))
         return self.model(inputs)
 
     def training_step(self, batch, batch_idx):
