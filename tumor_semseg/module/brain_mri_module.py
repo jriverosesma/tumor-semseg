@@ -25,6 +25,7 @@ from tumor_semseg.optimize.scheduler import CustomScheduler
 class QuantizationConfig:
     qconfig: str = "x86"
     auto_fuse_modules: bool = True
+    check_quantization: bool = False
 
 
 @dataclass
@@ -63,6 +64,7 @@ class BrainMRIModule(L.LightningModule):
         self.lr = None  # Special Lightning attribute used for initial LR tuning only
 
         if config.qat:
+            self.check_quantization = config.qat.check_quantization
             self.quant = quantization.QuantStub()
             self.dequant = quantization.DeQuantStub()
             self.eval()
@@ -124,7 +126,7 @@ class BrainMRIModule(L.LightningModule):
                 on_epoch=True,
             )
 
-    def get_quantized_model(self, check_quantization: bool = False):
+    def get_quantized_model(self):
         assert hasattr(self, "qconfig")
 
         orig_device = self.device
@@ -138,7 +140,7 @@ class BrainMRIModule(L.LightningModule):
         self.train()
         quant_model.train()
 
-        if check_quantization:
+        if self.check_quantization:
             assert torch.allclose(orig_output, quant_output, atol=1e-05)
 
         return quant_model
