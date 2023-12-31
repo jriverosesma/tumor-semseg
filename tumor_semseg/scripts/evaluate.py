@@ -69,15 +69,15 @@ def main(cfg: DictConfig):
         module = module.get_quantized_model()
 
     cfg.datamodule.config.augment = False
-    brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
-    brain_mri_datamodule.setup("fit")
+    datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
+    datamodule.setup("fit")
 
     trainer: Trainer = instantiate(cfg.trainer)
     trainer.logger.log_hyperparams(cfg)
 
     with torch.no_grad():
-        output_train = trainer.predict(module, dataloaders=brain_mri_datamodule.train_dataloader())
-        output_val = trainer.predict(module, dataloaders=brain_mri_datamodule.val_dataloader())
+        output_train = trainer.predict(module, dataloaders=datamodule.train_dataloader())
+        output_val = trainer.predict(module, dataloaders=datamodule.val_dataloader())
 
     metrics_train, table_train = compute_metrics_from_output(output_train, "train")
     metrics_val, table_val = compute_metrics_from_output(output_val, "val")
