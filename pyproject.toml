@@ -37,8 +37,8 @@ Pillow = "^10.1.0"
 prettytable = "^3.9.0"
 segmentation-models-pytorch = "^0.3.3"
 scikit-learn = "^1.3.2"
-#torch = {version = "^2.1.2+cu118", source = "pytorch-gpu-src"}
-#torchvision = {version = "^0.16.2+cu118", source = "pytorch-gpu-src"}
+torch = {version = "^2.1.2+cu118", source = "pytorch-gpu-src"}
+torchvision = {version = "^0.16.2+cu118", source = "pytorch-gpu-src"}
 tqdm = "4.66.1"
 
 # Development
