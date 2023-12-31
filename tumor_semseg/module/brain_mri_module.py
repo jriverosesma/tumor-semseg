@@ -63,12 +63,17 @@ class BrainMRIModule(L.LightningModule):
         self.lr = None  # Special Lightning attribute used for initial LR tuning only
 
         if config.qat:
-            self.model = nn.Sequential(quantization.QuantStub(), self.model, quantization.DeQuantStub())
-            self.model.eval()
-            self.model.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
+            self.forward = self.forward_quantize
+            self.quant = quantization.QuantStub()
+            self.dequant = quantization.DeQuantStub()
+            self.eval()
+            self.qconfig = quantization.get_default_qat_qconfig(config.qat.qconfig)
             if config.qat.auto_fuse_modules:
                 auto_fuse_modules(self.model)
-            quantization.prepare_qat(self.model.train(), inplace=True)
+            quantization.prepare_qat(self.train(), inplace=True)
+
+    def forward_quantize(self, inputs):
+        return self.dequant(self.model(self.quant(inputs)))
 
     def forward(self, inputs):
         return self.model(inputs)
