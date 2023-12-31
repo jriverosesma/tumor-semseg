@@ -12,6 +12,7 @@ import onnx
 import onnxruntime as ort
 import onnxsim
 import torch
+import torch.ao.quantization as quantization
 import torch.nn as nn
 from omegaconf import DictConfig
 from torch import _C, Tensor
@@ -34,7 +35,6 @@ class ExportableModel(nn.Module):
 
     def forward(self, inputs):
         if hasattr(self, "quant"):
-            self.model.add = torch.nn.quantized.FloatFunctional()
             return self.dequant(self.model(self.quant(inputs)))
         return self.model(inputs)
 
@@ -62,7 +62,7 @@ def main(cfg: DictConfig):
         orig_output = orig_model(module.example_input_array)
 
     if hasattr(module, "qconfig"):
-        quant_model = torch.ao.quantization.convert(orig_model)
+        quant_model = quantization.convert(orig_model)
         with torch.no_grad():
             quant_output = quant_model(module.example_input_array)
 

@@ -5,6 +5,7 @@ Evaluate model performance.
 # Third-Party
 import hydra
 import torch
+import torch.ao.quantization as quantization
 from hydra.utils import instantiate
 from lightning.pytorch import Trainer
 from omegaconf import DictConfig
@@ -61,18 +62,19 @@ def compute_global_metrics(metrics_train, metrics_val):
 def main(cfg: DictConfig):
     assert cfg.checkpoint is not None, "checkpoint must be specified in config for evaluation to run"
 
-    # Turn-off augmentations for evaluation
-    cfg.datamodule.config.augment = False
-
     brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     brain_mri_model.eval()
+    if cfg.module.qat:
+        cfg.trainer.precision = "fp32-true"
+        brain_mri_model = quantization.convert(brain_mri_model)
 
+    cfg.datamodule.config.augment = False
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
-    trainer: Trainer = instantiate(cfg.trainer)
+    brain_mri_datamodule.setup("fit")
 
+    trainer: Trainer = instantiate(cfg.trainer)
     trainer.logger.log_hyperparams(cfg)
 
-    brain_mri_datamodule.setup("fit")
     with torch.no_grad():
         output_train = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.train_dataloader())
         output_val = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.val_dataloader())

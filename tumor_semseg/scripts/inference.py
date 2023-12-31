@@ -12,6 +12,7 @@ import cv2
 import hydra
 import numpy as np
 import torch
+import torch.ao.quantization as quantization
 from albumentations.pytorch import ToTensorV2
 from omegaconf import DictConfig
 from PIL import Image
@@ -77,6 +78,10 @@ def main(cfg: DictConfig):
 
     model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     model.eval()
+    if cfg.module.qat:
+        cfg.trainer.precision = "fp32-true"
+        model = quantization.convert(model)
+
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=False)
 
