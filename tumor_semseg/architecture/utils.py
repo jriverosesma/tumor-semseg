@@ -9,13 +9,11 @@ import torch.ao.quantization as quantization
 import torch.nn as nn
 
 # Fusable patterns sorted by priority
-FUSABLE_PATTERNS = [
-    (nn.Conv2d, nn.BatchNorm2d, nn.ReLU),
-    (nn.Conv2d, nn.BatchNorm2d),
-    (nn.Conv2d, nn.ReLU),
-    (nn.Linear, nn.ReLU),
-    (nn.BatchNorm2d, nn.ReLU),
-]
+FUSABLE_PATTERNS = sorted(
+    quantization.fuser_method_mappings._DEFAULT_OP_LIST_TO_FUSER_METHOD.keys(),
+    key=lambda pattern: len(pattern),
+    reverse=True,
+)
 
 
 def auto_fuse_modules(model: nn.Module) -> None:
