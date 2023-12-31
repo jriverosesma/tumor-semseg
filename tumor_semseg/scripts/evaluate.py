@@ -62,11 +62,10 @@ def compute_global_metrics(metrics_train, metrics_val):
 def main(cfg: DictConfig):
     assert cfg.checkpoint is not None, "checkpoint must be specified in config for evaluation to run"
 
-    brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
-    brain_mri_model.eval()
-    if cfg.module.config.qat:
+    module: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    if hasattr(module, "qconfig"):
         cfg.trainer.precision = "32-true"
-        brain_mri_model = quantization.convert(brain_mri_model)
+        module = module.get_quantized_model()
 
     cfg.datamodule.config.augment = False
     brain_mri_datamodule: BrainMRIDataModule = instantiate(cfg.datamodule)
@@ -76,8 +75,8 @@ def main(cfg: DictConfig):
     trainer.logger.log_hyperparams(cfg)
 
     with torch.no_grad():
-        output_train = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.train_dataloader())
-        output_val = trainer.predict(brain_mri_model, dataloaders=brain_mri_datamodule.val_dataloader())
+        output_train = trainer.predict(module, dataloaders=brain_mri_datamodule.train_dataloader())
+        output_val = trainer.predict(module, dataloaders=brain_mri_datamodule.val_dataloader())
 
     metrics_train, table_train = compute_metrics_from_output(output_train, "train")
     metrics_val, table_val = compute_metrics_from_output(output_val, "val")

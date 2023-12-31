@@ -12,13 +12,12 @@ import onnx
 import onnxruntime as ort
 import onnxsim
 import torch
-import torch.ao.quantization as quantization
-import torch.nn as nn
 from omegaconf import DictConfig
 from torch import _C, Tensor
 
 # TumorSemSeg
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
+from tumor_semseg.module.utils import ExportableModel
 
 
 def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor: Tensor) -> None:
@@ -36,19 +35,14 @@ def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
-    module: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint, map_location=torch.device("cpu"))
-    orig_model = module.get_exportable_model()
-    orig_model.eval()
+    module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    if hasattr(module, "qconfig"):
+        module = module.get_quantized_model()
+    exportable_model: ExportableModel = ExportableModel(module)
+    exportable_model.eval()
 
     with torch.no_grad():
-        orig_output = orig_model(module.example_input_array)
-
-    if hasattr(module, "qconfig"):
-        quant_model = quantization.convert(orig_model)
-        with torch.no_grad():
-            quant_output = quant_model(module.example_input_array)
-
-        np.testing.assert_allclose(orig_output.numpy(), quant_output.numpy(), rtol=1e-03, atol=1e-05)
+        model_output = exportable_model(module.example_input_array)
 
     save_filepath = (
         str(Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx"))
@@ -58,7 +52,7 @@ def main(cfg: DictConfig):
 
     # Export from torch to ONNX
     torch.onnx.export(
-        quant_model,
+        exportable_model,
         module.example_input_array,
         save_filepath,
         export_params=True,
@@ -69,7 +63,7 @@ def main(cfg: DictConfig):
         output_names=cfg.export.output_names,
     )
 
-    check_onnx_model(save_filepath, quant_output, module.example_input_array)
+    check_onnx_model(save_filepath, model_output, module.example_input_array)
 
     # Simplify ONNX model
     simplified_model, check = onnxsim.simplify(
@@ -83,7 +77,7 @@ def main(cfg: DictConfig):
     assert check, "Simplified ONNX model could not be validated"
 
     onnx.save(simplified_model, save_filepath)
-    check_onnx_model(save_filepath, quant_output, module.example_input_array)
+    check_onnx_model(save_filepath, model_output, module.example_input_array)
 
 
 if __name__ == "__main__":

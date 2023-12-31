@@ -12,7 +12,6 @@ import cv2
 import hydra
 import numpy as np
 import torch
-import torch.ao.quantization as quantization
 from albumentations.pytorch import ToTensorV2
 from omegaconf import DictConfig
 from PIL import Image
@@ -76,10 +75,10 @@ def main(cfg: DictConfig):
         case _:
             raise KeyError("in_channels must be one 3 (RGB) or 1 (L)")
 
-    brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
-    brain_mri_model.eval()
-    if cfg.module.config.qat:
-        brain_mri_model = quantization.convert(brain_mri_model)
+    module: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    if hasattr(module, "qconfig"):
+        module = module.get_quantized_model()
+    module.eval()
 
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=False)
@@ -87,7 +86,7 @@ def main(cfg: DictConfig):
     with torch.no_grad():
         i = 0
         for input_images, images, image_paths in tqdm(dataloader):
-            preds = brain_mri_model(input_images.to(brain_mri_model.device)).permute(0, 2, 3, 1)  # [N, H, W, C]
+            preds = module(input_images).permute(0, 2, 3, 1)  # [N, H, W, C]
             preds = torch.where(preds > cfg.module.config.bin_det_threshold, 255.0, 0.0)
 
             for pred, image, image_path in zip(

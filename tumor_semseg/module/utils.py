@@ -3,8 +3,10 @@ Utilities to work with Lightning modules.
 """
 
 # Third-Party
-import lightning as L
 import torch.nn as nn
+
+# TumorSemSeg
+from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 
 class ExportableModel(nn.Module):
@@ -12,13 +14,13 @@ class ExportableModel(nn.Module):
     Auxiliary class to export models to ONNX due to Lightning module issues to export directly to ONNX.
     """
 
-    def __init__(self, module: L.LightningModule):
+    def __init__(self, module: BrainMRIModule):
         super().__init__()
 
         assert hasattr(module, "model"), "The inference must be contained within a standalone attribute `model`"
 
         self.model = module.model
-        if hasattr(module, "qconfig"):
+        if hasattr(module, "quant"):
             self.quant = module.quant
             self.dequant = module.dequant
 

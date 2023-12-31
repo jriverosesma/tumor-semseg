@@ -17,7 +17,6 @@ from torch import Tensor, nn
 # TumorSemSeg
 from tumor_semseg.architecture.utils import auto_fuse_modules
 from tumor_semseg.loss.semseg_losses import SemSegLoss
-from tumor_semseg.module.utils import ExportableModel
 from tumor_semseg.optimize.optimizer import CustomOptimizer
 from tumor_semseg.optimize.scheduler import CustomScheduler
 
@@ -73,7 +72,7 @@ class BrainMRIModule(L.LightningModule):
             quantization.prepare_qat(self.train(), inplace=True)
 
     def forward(self, inputs):
-        if hasattr(self, "qconfig"):
+        if hasattr(self, "quant"):
             return self.dequant(self.model(self.quant(inputs)))
         return self.model(inputs)
 
@@ -125,5 +124,21 @@ class BrainMRIModule(L.LightningModule):
                 on_epoch=True,
             )
 
-    def get_exportable_model(self):
-        return ExportableModel(self)
+    def get_quantized_model(self, check_quantization: bool = False):
+        assert hasattr(self, "qconfig")
+
+        orig_device = self.device
+        quant_model: BrainMRIModule = quantization.convert(self.eval().to("cpu"))
+        quant_model.to(orig_device)
+
+        quant_model.eval()
+        with torch.no_grad():
+            orig_output = self(self.example_input_array)
+            quant_output = quant_model(self.example_input_array)
+        self.train()
+        quant_model.train()
+
+        if check_quantization:
+            assert torch.allclose(orig_output, quant_output, atol=1e-05)
+
+        return quant_model
