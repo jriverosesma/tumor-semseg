@@ -20,6 +20,7 @@ git clone https://github.com/jriverosesma/tumor-semantic-segmentation
 conda create -n tumor-semseg python=3.10 --no-default-packages -y
 conda activate tumor-semseg
 python -m pip install --upgrade pip
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 pip install -e .[all]
 pre-commit install
 ```
