@@ -79,7 +79,6 @@ def main(cfg: DictConfig):
     model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     model.eval()
     if cfg.module.qat:
-        cfg.trainer.precision = "fp32-true"
         model = quantization.convert(model)
 
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)
