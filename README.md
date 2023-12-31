@@ -17,10 +17,8 @@ Implementation of Semantic Segmentation NN for tumor detection on <dataset-name>
 
 ```bash
 git clone https://github.com/jriverosesma/tumor-semantic-segmentation
-conda update -n base -c defaults conda -y
 conda create -n tumor-semseg python=3.10 --no-default-packages -y
 conda activate tumor-semseg
-conda install pytorch-cuda=12.1 -c pytorch -c nvidia -y
 python -m pip install --upgrade pip
 pip install -e .[all]
 pre-commit install
