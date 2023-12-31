@@ -17,6 +17,7 @@ from torch import Tensor, nn
 # TumorSemSeg
 from tumor_semseg.architecture.utils import auto_fuse_modules
 from tumor_semseg.loss.semseg_losses import SemSegLoss
+from tumor_semseg.module.utils import ExportableModel
 from tumor_semseg.optimize.optimizer import CustomOptimizer
 from tumor_semseg.optimize.scheduler import CustomScheduler
 
@@ -123,3 +124,6 @@ class BrainMRIModule(L.LightningModule):
                 on_step=False,
                 on_epoch=True,
             )
+
+    def get_exportable_model(self):
+        return ExportableModel(self)

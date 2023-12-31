@@ -78,7 +78,7 @@ def main(cfg: DictConfig):
 
     brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     brain_mri_model.eval()
-    if cfg.module.qat:
+    if cfg.module.config.qat:
         brain_mri_model = quantization.convert(brain_mri_model)
 
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)

@@ -21,24 +21,6 @@ from torch import _C, Tensor
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 
-class ExportableModel(nn.Module):
-    """
-    Auxiliary class to export models to ONNX due to Lightning module issues to export directly to ONNX.
-    """
-
-    def __init__(self, module: BrainMRIModule):
-        super().__init__()
-        self.model = module.model
-        if hasattr(module, "qconfig"):
-            self.quant = module.quant
-            self.dequant = module.dequant
-
-    def forward(self, inputs):
-        if hasattr(self, "quant"):
-            return self.dequant(self.model(self.quant(inputs)))
-        return self.model(inputs)
-
-
 def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor: Tensor) -> None:
     # Model check
     onnx.checker.check_model(onnx_model_path)
@@ -55,7 +37,7 @@ def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
     module: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint, map_location=torch.device("cpu"))
-    orig_model = ExportableModel(module)
+    orig_model = module.get_exportable_model()
     orig_model.eval()
 
     with torch.no_grad():

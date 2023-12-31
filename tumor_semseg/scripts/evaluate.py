@@ -64,8 +64,8 @@ def main(cfg: DictConfig):
 
     brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     brain_mri_model.eval()
-    if cfg.module.qat:
-        cfg.trainer.precision = "fp32-true"
+    if cfg.module.config.qat:
+        cfg.trainer.precision = "32-true"
         brain_mri_model = quantization.convert(brain_mri_model)
 
     cfg.datamodule.config.augment = False
