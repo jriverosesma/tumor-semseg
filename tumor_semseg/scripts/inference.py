@@ -76,10 +76,10 @@ def main(cfg: DictConfig):
         case _:
             raise KeyError("in_channels must be one 3 (RGB) or 1 (L)")
 
-    model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
-    model.eval()
+    brain_mri_model: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
+    brain_mri_model.eval()
     if cfg.module.qat:
-        model = quantization.convert(model)
+        brain_mri_model = quantization.convert(brain_mri_model)
 
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)
     dataloader = DataLoader(dataset, batch_size=cfg.batch_size, shuffle=False)
@@ -87,7 +87,7 @@ def main(cfg: DictConfig):
     with torch.no_grad():
         i = 0
         for input_images, images, image_paths in tqdm(dataloader):
-            preds = model(input_images.to(model.device)).permute(0, 2, 3, 1)  # [N, H, W, C]
+            preds = brain_mri_model(input_images.to(brain_mri_model.device)).permute(0, 2, 3, 1)  # [N, H, W, C]
             preds = torch.where(preds > cfg.module.config.bin_det_threshold, 255.0, 0.0)
 
             for pred, image, image_path in zip(
