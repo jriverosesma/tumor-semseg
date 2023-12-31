@@ -20,6 +20,25 @@ from torch import _C, Tensor
 from tumor_semseg.module.brain_mri_module import BrainMRIModule
 
 
+class ExportableModel(nn.Module):
+    """
+    Auxiliary class to export models to ONNX due to Lightning module issues to export directly to ONNX.
+    """
+
+    def __init__(self, module: BrainMRIModule):
+        super().__init__()
+        self.model = module.model
+        if hasattr(module, "qconfig"):
+            self.quant = module.quant
+            self.dequant = module.dequant
+
+    def forward(self, inputs):
+        if hasattr(self, "quant"):
+            self.model.add = torch.nn.quantized.FloatFunctional()
+            return self.dequant(self.model(self.quant(inputs)))
+        return self.model(inputs)
+
+
 def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor: Tensor) -> None:
     # Model check
     onnx.checker.check_model(onnx_model_path)
@@ -35,11 +54,19 @@ def check_onnx_model(onnx_model_path: str, expected_output: Tensor, input_tensor
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
 def main(cfg: DictConfig):
-    brain_mri_model: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint, map_location=torch.device("cpu"))
-    model = brain_mri_model.model
-    model.eval()
-    if hasattr(brain_mri_model, "qconfig"):
-        model = torch.ao.quantization.convert(model)
+    module: nn.Module = BrainMRIModule.load_from_checkpoint(cfg.checkpoint, map_location=torch.device("cpu"))
+    orig_model = ExportableModel(module)
+    orig_model.eval()
+
+    with torch.no_grad():
+        orig_output = orig_model(module.example_input_array)
+
+    if hasattr(module, "qconfig"):
+        quant_model = torch.ao.quantization.convert(orig_model)
+        with torch.no_grad():
+            quant_output = quant_model(module.example_input_array)
+
+        np.testing.assert_allclose(orig_output.numpy(), quant_output.numpy(), rtol=1e-03, atol=1e-05)
 
     save_filepath = (
         str(Path(cfg.checkpoint).parent / (Path(cfg.checkpoint).stem + ".onnx"))
@@ -47,13 +74,10 @@ def main(cfg: DictConfig):
         else cfg.export.save_filepath
     )
 
-    with torch.no_grad():
-        torch_output = model(brain_mri_model.example_input_array)
-
     # Export from torch to ONNX
     torch.onnx.export(
-        model,
-        brain_mri_model.example_input_array,
+        quant_model,
+        module.example_input_array,
         save_filepath,
         export_params=True,
         opset_version=cfg.export.opset_version,
@@ -63,7 +87,7 @@ def main(cfg: DictConfig):
         output_names=cfg.export.output_names,
     )
 
-    check_onnx_model(save_filepath, torch_output, brain_mri_model.example_input_array)
+    check_onnx_model(save_filepath, quant_output, module.example_input_array)
 
     # Simplify ONNX model
     simplified_model, check = onnxsim.simplify(
@@ -77,7 +101,7 @@ def main(cfg: DictConfig):
     assert check, "Simplified ONNX model could not be validated"
 
     onnx.save(simplified_model, save_filepath)
-    check_onnx_model(save_filepath, torch_output, brain_mri_model.example_input_array)
+    check_onnx_model(save_filepath, quant_output, module.example_input_array)
 
 
 if __name__ == "__main__":
