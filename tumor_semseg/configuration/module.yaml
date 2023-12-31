@@ -19,3 +19,4 @@ module:
       # _target_: tumor_semseg.module.brain_mri_module.QuantizationConfig
       # qconfig: x86
       # auto_fuse_modules: true
+      # check_quantization: false
