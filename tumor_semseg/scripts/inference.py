@@ -78,6 +78,7 @@ def main(cfg: DictConfig):
     module: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     if hasattr(module, "qconfig"):
         module = module.get_quantized_model()
+        module.to(torch.device("cpu"))  # Inference generally faster on CPU than CUDA device for int8 models
     module.eval()
 
     dataset = BrainMRIInferenceDataset(Path(cfg.dataset_dirpath), grayscale, cfg.image_size)

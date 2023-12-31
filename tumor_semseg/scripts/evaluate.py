@@ -65,6 +65,7 @@ def main(cfg: DictConfig):
     module: BrainMRIModule = BrainMRIModule.load_from_checkpoint(cfg.checkpoint)
     if hasattr(module, "qconfig"):
         cfg.trainer.precision = "32-true"
+        cfg.trainer.accelerator = "cpu"  # Inference generally faster on CPU than CUDA device for int8 models
         module = module.get_quantized_model()
 
     cfg.datamodule.config.augment = False
