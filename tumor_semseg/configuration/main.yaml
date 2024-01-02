@@ -15,6 +15,7 @@ find_initial_lr: false
 n_classes: 1
 in_channels: 3
 image_size: [256, 256]
+lr: 1e-3
 batch_size: 32
 
 trainer:

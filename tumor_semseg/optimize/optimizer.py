@@ -12,12 +12,12 @@ from torch.optim import SGD, Adam, Adamax, Optimizer, RMSprop
 
 
 class CustomOptimizer:
-    def __init__(self, optimizer_class: Optimizer, args: dict[str, Any]):
+    def __init__(self, optimizer_class: Optimizer, optimizer_args: dict[str, Any]):
         self.optimizer_class: Type[Optimizer] = optimizer_class
-        self.args: dict[str, Any] = args
+        self.optimizer_args: dict[str, Any] = optimizer_args
 
     def get_optimizer(self, model: torch.nn.Module):
-        return self.optimizer_class(model.parameters(), **self.args)
+        return self.optimizer_class(model.parameters(), **self.optimizer_args)
 
 
 adam: CustomOptimizer = partial(CustomOptimizer, Adam, {"lr": 1e-3, "weight_decay": 1e-4})
