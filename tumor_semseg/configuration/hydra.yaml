@@ -12,7 +12,7 @@ hydra:
     storage: null
     study_name: tumorsemseg
     n_jobs: 1
-    n_trials: 50
+    n_trials: 30
     params:
       lr: interval(0.0001, 0.1)
       batch_size: choice(8, 16, 32, 64, 128, 256)
