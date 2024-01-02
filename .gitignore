@@ -6,7 +6,7 @@
 .aim/
 lightning_logs/
 logs/log_*
-/output/
+/outputs/
 /multirun/
 
 # Byte-compiled / optimized / DLL files
