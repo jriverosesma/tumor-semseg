@@ -2,9 +2,6 @@ defaults:
   - override /hydra/sweeper: optuna
 
 hydra:
-  run:
-    dir: "."
-  output_subdir: null
   sweeper:
     sampler:
       _target_: optuna.samplers.TPESampler

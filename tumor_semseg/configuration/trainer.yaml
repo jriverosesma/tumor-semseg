@@ -27,7 +27,6 @@ trainer:
       mode: max
       save_last: true
       save_top_k: 1
-    - _target_: lightning.pytorch.callbacks.RichProgressBar
     - _target_: tumor_semseg.module.callbacks.CustomModelPruning
       pruning_fn: ln_structured
       parameter_names: [weight]
