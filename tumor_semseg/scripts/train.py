@@ -4,6 +4,7 @@ This files defines the entry point for training.
 
 # Standard
 import warnings
+from math import log
 
 # Third-Party
 import hydra
