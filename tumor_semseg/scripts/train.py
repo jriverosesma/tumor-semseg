@@ -9,6 +9,7 @@ import warnings
 import hydra
 from hydra.utils import instantiate
 from lightning.pytorch import Trainer, seed_everything
+from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.tuner import Tuner
 from omegaconf import DictConfig
 
@@ -19,7 +20,7 @@ from tumor_semseg.module.callbacks import CustomModelPruning
 
 
 @hydra.main(config_path="../configuration", config_name="main", version_base="1.3")
-def main(cfg: DictConfig):
+def main(cfg: DictConfig) -> float:
     if cfg.seed:
         seed_everything(cfg.seed)
 
@@ -52,6 +53,11 @@ def main(cfg: DictConfig):
     trainer.logger.log_hyperparams(cfg)
 
     trainer.fit(module, datamodule=datamodule)
+
+    # Return best model score
+    for callback in trainer.callbacks:
+        if isinstance(callback, ModelCheckpoint):
+            return float(callback.best_model_score)
 
 
 if __name__ == "__main__":
