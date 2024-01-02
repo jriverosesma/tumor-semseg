@@ -6,6 +6,8 @@
 .aim/
 lightning_logs/
 logs/log_*
+/output/
+/multirun/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
