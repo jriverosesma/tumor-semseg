@@ -18,7 +18,7 @@ trainer:
     - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
       monitor: val_total_loss
       mode: min
-      patience: 10
+      patience: 5
       min_delta: 1e-4
       verbose: true
     - _target_: lightning.pytorch.callbacks.ModelCheckpoint
