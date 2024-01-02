@@ -10,7 +10,7 @@ module:
       _target_: tumor_semseg.loss.semseg_losses.CELoss
     optimizer:
       _target_: tumor_semseg.optimize.optimizer.adam
-      optimizer_args:
+      args:
         lr: ${lr}
         weight_decay: 1e-4
     scheduler:

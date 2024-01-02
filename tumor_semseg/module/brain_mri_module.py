@@ -108,7 +108,7 @@ class BrainMRIModule(L.LightningModule):
         # For initial LR tuning
         if self.lr is not None:
             self.optimizer.args["lr"] = self.lr
-        config = {"optimizer": self.optimizer.get_optimizer(self)}
+        config = {"optimizer": self.optimizer.get_optimizer(self.model)}
         if self.scheduler:
             config["lr_scheduler"] = {"scheduler": self.scheduler.get_scheduler(config["optimizer"])}
             if self.scheduler.params:
