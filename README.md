@@ -8,7 +8,9 @@
 
 
 <div align="center">
-    <img src="assets/pl.png" width="200"> <img src="assets/hydra.jpeg" width="200"> <img src="assets/aimstack.png" width="200">
+    <img src="assets/pl.png" width="200"> 
+    <img src="assets/hydra.jpeg" width="200"> 
+    <img src="assets/aimstack.png" width="200">
 </div>
 
 ## Table of contents
@@ -24,8 +26,9 @@ This is a lightweight and flexible Semantic Segmentation framework for MRI tumor
 
 We can easily extend the framework to new datasets thanks to Lightning datamodules.
 
-<div align="center">
-    <img src="assets/pred.jpeg" width="500">
+<div align="center"">
+    <img src="assets/pred1.jpeg" width="250"> 
+    <img src="assets/pred1.jpeg" width="250"> 
     <img src="assets/gt_pred.png" width="500">
 </div>
 
