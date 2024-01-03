@@ -11,10 +11,6 @@
     <img src="assets/pl.png" width="200"> <img src="assets/hydra.jpeg" width="200"> <img src="assets/aimstack.png" width="200">
 </div>
 
-<div align="center">
-    <img src="assets/pred.png" width="200">
-</div>
-
 ## Table of contents
 1. [Overview](README.md#1-overview)  
 2. [Installation](README.md#2-installation)  
@@ -27,6 +23,11 @@
 This is a lightweight and flexible Semantic Segmentation framework for MRI tumor detection on [LGG MRI Segmentation Dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
 
 We can easily extend the framework to new datasets thanks to Lightning datamodules.
+
+<div align="center">
+    <img src="assets/pred.png" width="500">
+    <img src="assets/gt_pred.png" width="500">
+</div>
 
 ## 2. Installation
 
