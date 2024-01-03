@@ -27,16 +27,19 @@ pre-commit install
 
 ## 3. Quickstart
 1. Follow the [installation instructions](README.md#2-installation).
-2. Download and extract dataset from Kaggle [here](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
-3. Specify `dataset_dirpath` in the configuration [here](tumor_semseg/configuration/main.yaml).
+2. Download and extract dataset from [Kaggle](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
+3. Specify `dataset_dirpath` in the [main configuration file](tumor_semseg/configuration/main.yaml).
 4. Train using `semseg_train` command.
-5. Replace `checkpoint` in main configuration file [here](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training.
+5. Replace `checkpoint` in the [main configuration file](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training.
 6. Run model evaluation using `semseg_eval`.
 7. Run inferences using `semseg_infer`.
 8. Export the model to ONNX using `semseg_export`.
 
 ## 4. Features
-The frameworks is based mainly in Lightning and Hydra 
+The frameworks is based in:
+- Lightning for training.
+- Hydra for configuration management.
+- Aim Stack for logging. 
 
 ![PyTorch Lightning](assets/pl.png)
 ![Hydra](assets/hydra.jpeg)
