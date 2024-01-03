@@ -11,7 +11,7 @@
 
 ## 1. Overview
 
-Implementation of Semantic Segmentation NN for tumor detection on <dataset-name> dataset.
+This is a lightweight and flexible Semantic Segmentation framework for MRI tumor detection on [LGG MRI Segmentation Dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation). We can easily extend the framework to new datasets thanks to Lightning datamodules.
 
 ## 2. Installation
 
@@ -26,10 +26,28 @@ pre-commit install
 ```
 
 ## 3. Quickstart
-
+1. Follow the [installation instructions](README.md#2-installation).
+2. Download and extract dataset from Kaggle [here](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
+3. Specify `dataset_dirpath` in the configuration [here](tumor_semseg/configuration/main.yaml).
+4. Train using `semseg_train` command.
+5. Replace `checkpoint` in main configuration file [here](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training.
+6. Run model evaluation using `semseg_eval`.
+7. Run inferences using `semseg_infer`.
+8. Export the model to ONNX using `semseg_export`.
 
 ## 4. Features
+The frameworks is based mainly in Lightning and Hydra 
 
+![PyTorch Lightning](assets/pl.png)
+![Hydra](assets/hydra.jpeg)
+![Aim Stack](assets/aimstack.png)
+
+- Scripts: train, inference, evaluate, export.
+- Integration with SMP.
+- Easy configuration: Hydra.
+- Sweeper.
+- QAT.
+- Pruning.
 
 ## 5. Running tests
 
