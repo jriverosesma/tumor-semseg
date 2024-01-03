@@ -1,4 +1,9 @@
 [![Unit tests](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml)
+[![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](LICENSE)
+[![Lightning](https://img.shields.io/badge/Lightning)](Lightning)
+[![Hydra](https://img.shields.io/badge/Hydra)](Hydra)
+[![AimStack](https://img.shields.io/badge/AimStack)](AimStack)
+
 
 # Tumor Semantic Segmentation
 
@@ -29,8 +34,8 @@ pre-commit install
 1. Follow the [installation instructions](README.md#2-installation).
 2. Download and extract dataset from [Kaggle](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
 3. Specify `dataset_dirpath` in the [main configuration file](tumor_semseg/configuration/main.yaml).
-4. Train using `semseg_train` command.
-5. Replace `checkpoint` in the [main configuration file](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training.
+4. Train using `semseg_train` command. Run `aim up` in a different terminal to keep track of the training using AimStack logger.
+5. Replace `checkpoint` in the [main configuration file](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training. The epoch and last epoch models are saved in `.aim/<experiment_name>/<run_id>` by default.
 6. Run model evaluation using `semseg_eval`.
 7. Run inferences using `semseg_infer`.
 8. Export the model to ONNX using `semseg_export`.
@@ -43,7 +48,7 @@ The frameworks is based in:
 
 ![PyTorch Lightning](assets/pl.png)
 ![Hydra](assets/hydra.jpeg)
-![Aim Stack](assets/aimstack.png)
+![AimStack](assets/aimstack.png)
 
 - Scripts: train, inference, evaluate, export.
 - Integration with SMP.
