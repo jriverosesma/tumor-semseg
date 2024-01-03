@@ -27,8 +27,8 @@ This is a lightweight and flexible Semantic Segmentation framework for MRI tumor
 We can easily extend the framework to new datasets thanks to Lightning datamodules.
 
 <div align="center"">
-    <img src="assets/pred1.jpeg" width="250"> 
-    <img src="assets/pred1.jpeg" width="250"> 
+    <img src="assets/pred_1.jpeg" width="250"> 
+    <img src="assets/pred_2.jpeg" width="250"> 
     <img src="assets/gt_pred.png" width="500">
 </div>
 
