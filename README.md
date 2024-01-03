@@ -11,6 +11,9 @@
     <img src="assets/pl.png" width="200"> <img src="assets/hydra.jpeg" width="200"> <img src="assets/aimstack.png" width="200">
 </div>
 
+<div align="center">
+    <img src="assets/pred.png" width="200">
+</div>
 
 ## Table of contents
 1. [Overview](README.md#1-overview)  
