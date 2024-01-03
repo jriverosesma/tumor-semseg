@@ -54,10 +54,10 @@ pre-commit install
 - Easy configuration management using [Hydra](https://github.com/facebookresearch/hydra) ⚙️
 - Supercharged logging using [Aim](https://github.com/aimhubio/aim) 🗃
 - Ready to use scripts: 
-    - Train from scratch or from a checkpoint.
-    - Run inference on images.
-    - Compute metrics for model evaluation.
-    - Export model to ONNX.
+    - Train from scratch or from a checkpoint: `semseg_train`.
+    - Compute metrics for model evaluation: `semseg_eval`.
+    - Run inference on images: `semseg_infer`.
+    - Export model to ONNX: `semseg_export`.
 - Direct integration with [Segmentation Models PyTorch](https://github.com/qubvel/segmentation_models.pytorch) via Hydra config: more than 124 encoders and many model architectures ready to use.
 - Hyper-parameter tuning using Optuna plugin for Hydra.
 - Model compression:
