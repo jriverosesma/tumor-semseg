@@ -8,9 +8,9 @@
 
 
 <div align="center">
-    <img src="assets/pl.png" width="200"> 
-    <img src="assets/hydra.jpeg" width="200"> 
-    <img src="assets/aimstack.png" width="200">
+    <img src="assets/pl.png" alt="PyTorch Lightning" width="200"> 
+    <img src="assets/hydra.jpeg" alt="Hydra" width="200"> 
+    <img src="assets/aimstack.png" alt="AimStack" width="200">
 </div>
 
 ## Table of contents
@@ -26,10 +26,19 @@ This is a lightweight and flexible Semantic Segmentation framework for MRI tumor
 
 We can easily extend the framework to new datasets thanks to Lightning datamodules.
 
-<div align="center"">
-    <img src="assets/pred_1.jpeg" width="250"> 
-    <img src="assets/pred_2.jpeg" width="250"> 
-    <img src="assets/gt_pred.png" width="500">
+<br>
+<div align="center">
+    <table>
+        <tr>
+            <td><img src="assets/pred_1.jpeg" alt="Pred 1" width="200"/></td>
+            <td><img src="assets/pred_2.jpeg" alt="Pred 2" width="200"/></td>
+            <td rowspan="2"><img src="assets/gt_pred.png" alt="GT - Pred" width="500"></td>
+        </tr>
+        <tr>
+            <td><img src="assets/pred_3.jpeg" alt="Pred 3" width="200"/></td>
+            <td><img src="assets/pred_4.jpeg" alt="Pred 4" width="200"/></td>
+        </tr>
+    </table>
 </div>
 
 ## 2. Installation
