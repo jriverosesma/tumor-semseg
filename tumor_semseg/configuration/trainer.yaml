@@ -32,7 +32,7 @@ trainer:
       parameter_names: [weight]
       pruning_dim: 0
       pruning_norm: 1
-      amount: 0.01
+      amount: 0.005
       use_global_unstructured: false
       apply_pruning: true
       make_pruning_permanent: true
