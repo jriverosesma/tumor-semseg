@@ -1,11 +1,16 @@
-[![Unit tests](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml)
-[![License](https://img.shields.io/badge/License-MIT%202.0-blue.svg)](LICENSE)
-[![Lightning](https://img.shields.io/badge/Lightning)](Lightning)
-[![Hydra](https://img.shields.io/badge/Hydra)](Hydra)
-[![AimStack](https://img.shields.io/badge/AimStack)](AimStack)
-
-
 # Tumor Semantic Segmentation
+
+[![Unit tests](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml/badge.svg)](https://github.com/jriverosesma/python-project/actions/workflows/unit_tests.yaml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Lightning](https://img.shields.io/badge/Lightning-8A2BE2)](https://github.com/Lightning-AI/pytorch-lightning)
+[![Hydra](https://img.shields.io/badge/Hydra-blue)](https://github.com/facebookresearch/hydra)
+[![Aim](https://img.shields.io/badge/Aim-gray)](https://github.com/aimhubio/aim)
+
+
+<div align="center">
+    <img src="assets/pl.png" width="200"> <img src="assets/hydra.jpeg" width="200"> <img src="assets/aimstack.png" width="200">
+</div>
+
 
 ## Table of contents
 1. [Overview](README.md#1-overview)  
@@ -16,7 +21,9 @@
 
 ## 1. Overview
 
-This is a lightweight and flexible Semantic Segmentation framework for MRI tumor detection on [LGG MRI Segmentation Dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation). We can easily extend the framework to new datasets thanks to Lightning datamodules.
+This is a lightweight and flexible Semantic Segmentation framework for MRI tumor detection on [LGG MRI Segmentation Dataset](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
+
+We can easily extend the framework to new datasets thanks to Lightning datamodules.
 
 ## 2. Installation
 
@@ -31,38 +38,38 @@ pre-commit install
 ```
 
 ## 3. Quickstart
+
 1. Follow the [installation instructions](README.md#2-installation).
 2. Download and extract dataset from [Kaggle](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
-3. Specify `dataset_dirpath` in the [main configuration file](tumor_semseg/configuration/main.yaml).
-4. Train using `semseg_train` command. Run `aim up` in a different terminal to keep track of the training using AimStack logger.
-5. Replace `checkpoint` in the [main configuration file](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training. The epoch and last epoch models are saved in `.aim/<experiment_name>/<run_id>` by default.
+3. Specify the `dataset_dirpath` in the [main configuration file](tumor_semseg/configuration/main.yaml).
+4. Train using `semseg_train` command. Run `aim up` in a different terminal to keep track of the training using Aim logger.
+5. Replace `checkpoint` in the [main configuration file](tumor_semseg/configuration/main.yaml) by the path of the checkpoint saved after training. The best and last epoch models are saved by default in `.aim/<experiment_name>/<run_id>`.
 6. Run model evaluation using `semseg_eval`.
 7. Run inferences using `semseg_infer`.
 8. Export the model to ONNX using `semseg_export`.
 
 ## 4. Features
-The frameworks is based in:
-- Lightning for training.
-- Hydra for configuration management.
-- Aim Stack for logging. 
 
-![PyTorch Lightning](assets/pl.png)
-![Hydra](assets/hydra.jpeg)
-![AimStack](assets/aimstack.png)
-
-- Scripts: train, inference, evaluate, export.
-- Integration with SMP.
-- Easy configuration: Hydra.
-- Sweeper.
-- QAT.
-- Pruning.
+- Training powered by [Lightning](https://github.com/Lightning-AI/pytorch-lightning) ⚡
+- Easy configuration management using [Hydra](https://github.com/facebookresearch/hydra) ⚙️
+- Supercharged logging using [Aim](https://github.com/aimhubio/aim) 🗃
+- Ready to use scripts: 
+    - Train from scratch or from a checkpoint.
+    - Run inference on images.
+    - Compute metrics for model evaluation.
+    - Export model to ONNX.
+- Direct integration with [Segmentation Models PyTorch](https://github.com/qubvel/segmentation_models.pytorch) via Hydra config: more than 124 encoders and many model architectures ready to use.
+- Hyper-parameter tuning using Optuna plugin for Hydra.
+- Model compression:
+    - Quantized Aware Training using PyTorch quantization modules.
+    - Pruning Aware Training using Lightning callbacks.
 
 ## 5. Running tests
 
-Follow the installation instructions. Then run the following commands from the root of the repository.
+Follow the [installation instructions](README.md#2-installation). Then run the following commands from the root of the repository.
 
 ```bash
 pytest
 ```
 
-NOTE: Make sure to active the conda environment with `conda activate tumor_semseg` before running the tests.
+**NOTE**: Make sure to active the conda environment with `conda activate tumor_semseg` before running the tests.
