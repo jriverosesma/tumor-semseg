@@ -44,14 +44,12 @@ class BrainMRIDataModuleConfig:
 class BrainMRIDataset(Dataset):
     def __init__(
         self,
-        dataset: str,
         images: list[str],
         masks: list[str],
         augment: bool,
         grayscale: bool,
         image_size: tuple[int, int],
     ):
-        self.dataset = dataset
         self.images = images
         self.masks = masks
         self.grayscale = grayscale
@@ -115,7 +113,6 @@ class BrainMRIDataModule(L.LightningDataModule):
                     raise KeyError("in_channels must be one 3 (RGB) or 1 (L)")
 
             self.train = BrainMRIDataset(
-                "train",
                 x_train,
                 y_train,
                 augment=self.config.augment,
@@ -123,7 +120,11 @@ class BrainMRIDataModule(L.LightningDataModule):
                 image_size=self.config.image_size,
             )
             self.val = BrainMRIDataset(
-                "val", x_val, y_val, augment=False, grayscale=grayscale, image_size=self.config.image_size
+                x_val,
+                y_val,
+                augment=False,
+                grayscale=grayscale,
+                image_size=self.config.image_size,
             )
 
     def train_dataloader(self):
