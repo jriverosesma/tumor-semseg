@@ -1,0 +1,10 @@
+export:
+  save_filepath: null
+  verbose: false
+  opset_version: 17
+  do_constant_folding: true
+  input_names: [input]
+  output_names: [output]
+  check_n: 10
+  perform_optimization: true
+  skip_fuse_bn: false

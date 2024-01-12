@@ -1,20 +1,40 @@
 [tool.poetry]
-name = "my-package"
+name = "tumor_semseg"
 version = "v0.1.0"
-description = "Simple and effective Python project template"
+description = "Semantic segmentation for tumor detection"
 authors = ["Juan Rivero Sesma <jriverosesma@gmail.com>"]
 readme = "README.md"
+license = "MIT"
 include = ["NOTICES", "LICENSE", "CHANGELOG.md"]
 classifiers = [
     "Programming Language :: Python :: 3",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/jriverosesma/python-project"
-"Issue Tracker" = "https://github.com/jriverosesma/python-project/issues"
+"Homepage" = "https://github.com/jriverosesma/tumor-semantic-segmentation"
+"Issue Tracker" = "https://github.com/jriverosesma/tumor-semantic-segmentation/issues"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+aim = "^3.17.5"
+albumentations = "^1.3.1"
+hydra-core = "^1.3.2"
+hydra-optuna-sweeper = "^1.2.0"
+lightning = "^2.1.3"
+matplotlib = "3.8.2"
+netron = "7.3.6"
+numpy = "^1.26.2"
+onnx = "^1.15.0"
+onnxruntime-gpu = "^1.16.3"
+onnxsim = "^0.4.35"
+omegaconf = "^2.3.0"
+opencv-python = "^4.8.1.78"
+pandas = "^2.1.4"
+Pillow = "^10.1.0"
+prettytable = "^3.9.0"
+segmentation-models-pytorch = "^0.3.3"
+scikit-learn = "^1.3.2"
+tqdm = "4.66.1"
 
 # Development
 black = { version = "^23.9.1", optional = true }
@@ -39,7 +59,10 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-my_package_script = "my_package.main:main"
+semseg_train = "tumor_semseg.scripts.train:main"
+semseg_eval = "tumor_semseg.scripts.evaluate:main"
+semseg_infer = "tumor_semseg.scripts.inference:main"
+semseg_export = "tumor_semseg.scripts.export:main"
 
 [tool.black]
 line-length = 120
@@ -47,9 +70,10 @@ line-length = 120
 [tool.isort]
 profile = "black"
 line_length = 120
-known_first_party = ["my_package"]
-import_heading_firstparty = "My Package"
-
+known_first_party = ["tumor_semseg"]
+import_heading_stdlib = "Standard"
+import_heading_thirdparty = "Third-Party"
+import_heading_firstparty = "TumorSemSeg"
 
 [tool.bumpver]
 current_version = "v0.1.0"
@@ -64,7 +88,7 @@ commit_message  = "Bump version: {old_version} → {new_version}"
     '^current_version = "{version}"$',
     '^version = "{version}"$',
 ]
-"my_package/__init__.py" = [
+"tumor_semseg/__init__.py" = [
     '^__version__ = "{version}"$',
 ]
 

@@ -1,0 +1,9 @@
+_target_: tumor_semseg.architecture.unet.UNet
+config:
+  _target_: tumor_semseg.architecture.unet.UNetConfig
+  n_classes: ${n_classes}
+  in_channels: ${in_channels}
+  activation_name: ReLU
+  activation_params:
+    inplace: true
+  bilinear: false

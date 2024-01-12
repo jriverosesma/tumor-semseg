@@ -1,0 +1,23 @@
+defaults:
+  - datamodule
+  - module
+  - trainer
+  - export
+  - hydra
+  - _self_
+
+tumor_semseg_version:
+  _target_: tumor_semseg.__version__
+seed: null
+checkpoint: null
+dataset_dirpath: data/kaggle_3m
+find_initial_lr: false
+n_classes: 1
+in_channels: 3
+image_size: [256, 256]
+lr: 1e-3
+batch_size: 32
+
+trainer:
+  logger:
+    experiment: tumorsemseg

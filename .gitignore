@@ -1,5 +1,13 @@
+# tumor_semseg
+/data/
+/preds/
+
 # Log
+.aim/
+lightning_logs/
 logs/log_*
+/outputs/
+/multirun/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

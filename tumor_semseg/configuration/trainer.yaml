@@ -1,0 +1,46 @@
+trainer:
+  _target_: lightning.Trainer
+  accelerator: auto
+  devices: auto
+  precision: 16-mixed
+  # precision: bf16-mixed  # Preferred over "16-mixed" if supported for the GPU in use
+  sync_batchnorm: true
+  deterministic: false
+  max_epochs: 100
+  profiler: null
+  log_every_n_steps: 5
+  logger:
+    _target_: aim.sdk.adapters.pytorch_lightning.AimLogger
+    experiment: tumorsemseg
+    train_metric_prefix: train_
+    val_metric_prefix: val_
+  callbacks:
+    - _target_: lightning.pytorch.callbacks.early_stopping.EarlyStopping
+      monitor: val_total_loss
+      mode: min
+      patience: 5
+      min_delta: 1e-4
+      verbose: true
+    - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+      filename: "{epoch}-{val_mIoU:.2f}"
+      monitor: val_mIoU
+      mode: max
+      save_last: true
+      save_top_k: 1
+    - _target_: tumor_semseg.module.callbacks.CustomModelPruning
+      pruning_fn: ln_structured
+      parameter_names: [weight]
+      pruning_dim: 0
+      pruning_norm: 1
+      amount: 0.005
+      use_global_unstructured: false
+      apply_pruning: true
+      make_pruning_permanent: true
+      prune_on_train_epoch_end: true
+      verbose: 1
+    - _target_: lightning.pytorch.callbacks.model_summary.ModelSummary
+      max_depth: -1
+    - _target_: tumor_semseg.module.callbacks.ComputeIoUCallback
+    - _target_: tumor_semseg.module.callbacks.PredVisualizationCallback
+      log_every_n_batches: 5
+      n_samples: 5

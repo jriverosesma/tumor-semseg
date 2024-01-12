@@ -1,0 +1,7 @@
+_target_: tumor_semseg.architecture.deeplab.DeepLabv3
+config:
+  _target_: tumor_semseg.architecture.deeplab.DeepLabv3Config
+  n_classes: ${n_classes}
+  in_channels: ${in_channels}
+  model_version_key: mobilenet
+  pretrained: false
