@@ -5,7 +5,6 @@ Evaluate model performance.
 # Third-Party
 import hydra
 import torch
-import torch.ao.quantization as quantization
 from hydra.utils import instantiate
 from lightning.pytorch import Trainer
 from omegaconf import DictConfig
