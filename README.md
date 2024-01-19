@@ -55,6 +55,12 @@ pre-commit install
 
 ## 3. Quickstart
 
+### 3.1 Notebook
+
+Check the Kaggle notebook [here](notebooks/kaggle_tutorial.ipynb) for a practical example on how to use the framework ⭐
+
+### 3.2 Step by step
+
 1. Follow the [installation instructions](README.md#2-installation).
 2. Download and extract dataset from [Kaggle](https://www.kaggle.com/datasets/mateuszbuda/lgg-mri-segmentation).
 3. Specify the `dataset_dirpath` in the [main configuration file](tumor_semseg/configuration/main.yaml).
